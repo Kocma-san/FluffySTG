@@ -56,7 +56,7 @@
 		UnregisterSignal(fax_ref.resolve(), COMSIG_FAX_MESSAGE_RECEIVED)
 	return ..()
 
-/datum/computer_file/program/fax_manager/proc/establish_connection(datum/target, mob/user)
+/datum/computer_file/program/fax_manager/proc/connect_fax(datum/target, mob/user)
 	if(!istype(target, /obj/machinery/fax))
 		return FALSE
 
@@ -122,7 +122,7 @@
 		if("scan_for_faxes")
 			for (var/elem in view(1, usr))
 				if (istype(elem, /obj/machinery/fax))
-					establish_connection(elem, usr)
+					connect_fax(elem, usr)
 			return TRUE
 
 /datum/computer_file/program/fax_manager/proc/send_notification(obj/machinery/fax/fax, obj/item/loaded, sender_name)
