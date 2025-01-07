@@ -879,12 +879,6 @@
 	dir = 1
 	},
 /area/station/engineering/main)
-"ajw" = (
-/obj/machinery/atmospherics/pipe/smart/manifold4w/pink/hidden{
-	dir = 4
-	},
-/turf/open/floor/plating,
-/area/station/maintenance/port/fore)
 "ajx" = (
 /obj/structure/cable,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4{
@@ -1176,6 +1170,7 @@
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2{
 	dir = 4
 	},
+/obj/structure/cable,
 /turf/open/floor/iron/dark{
 	icon_state = "textured_dark_large"
 	},
@@ -23491,6 +23486,7 @@
 /obj/machinery/door/airlock/service{
 	name = "Bar Entrance"
 	},
+/obj/structure/disposalpipe/segment,
 /turf/open/floor/iron/dark/smooth_large{
 	icon_state = "textured_dark_half"
 	},
@@ -31127,7 +31123,6 @@
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
 /obj/structure/disposalpipe/segment,
-/obj/effect/mapping_helpers/airlock/unres,
 /obj/effect/mapping_helpers/airlock/access/any/engineering/construction,
 /turf/open/floor/plating,
 /area/station/maintenance/port/aft)
@@ -36360,6 +36355,7 @@
 /obj/item/borg/upgrade/rename{
 	pixel_y = 16
 	},
+/obj/item/toy/crayon/spraycan/roboticist,
 /turf/open/floor/iron/checker,
 /area/station/science/robotics/lab)
 "hOM" = (
@@ -44179,7 +44175,7 @@
 /area/station/hallway/secondary/exit)
 "mHQ" = (
 /obj/machinery/door/airlock/bathroom{
-	name = "Cabin 2"
+	name = "Restrooms"
 	},
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4{
 	dir = 4
@@ -48235,6 +48231,7 @@
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
 /obj/structure/cable,
 /obj/effect/turf_decal/siding/wideplating/dark,
+/obj/structure/disposalpipe/segment,
 /turf/open/floor/wood/large{
 	icon_state = "wood_parquet"
 	},
@@ -50758,6 +50755,7 @@
 	},
 /obj/item/reagent_containers/syringe,
 /obj/machinery/light/directional/east,
+/obj/structure/sign/eyechart/directional/east,
 /turf/open/floor/iron,
 /area/station/medical/medbay/central)
 "qHL" = (
@@ -53798,7 +53796,7 @@
 /area/station/security/prison)
 "sHg" = (
 /obj/machinery/door/airlock/bathroom{
-	name = "Cabin 2"
+	name = "Restrooms"
 	},
 /obj/structure/cable,
 /turf/open/floor/iron/dark/herringbone,
@@ -59795,6 +59793,7 @@
 	},
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
 /obj/effect/landmark/start/hangover,
+/obj/structure/disposalpipe/segment,
 /turf/open/floor/iron/dark/smooth_large{
 	icon_state = "textured_dark_half"
 	},
@@ -79084,7 +79083,7 @@ alR
 aoj
 hKJ
 apP
-ajw
+aiR
 alU
 uWN
 iEe

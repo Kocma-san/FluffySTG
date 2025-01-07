@@ -19,7 +19,7 @@
 	active_msg = "You summon forth three blades of furious silver."
 	deactive_msg = "You conceal the blades of furious silver."
 	cast_range = 20
-	projectile_type = /obj/projectile/floating_blade
+	projectile_type = /obj/effect/floating_blade
 	projectile_amount = 3
 
 	/// A ref to the status effect surrounding our heretic on activation.
@@ -101,7 +101,7 @@
 	icon = 'icons/effects/eldritch.dmi'
 	icon_state = "dio_knife"
 	speed = 2
-	damage = 25
+	damage = 35 // FLUFFY FRONTIER EDIT: ANTAG BUFF #5159; original: 25
 	armour_penetration = 100
 	sharpness = SHARP_EDGED
 	wound_bonus = 15
