@@ -1,6 +1,13 @@
 import { BooleanLike } from '../../common/react';
 import { useBackend } from '../backend';
-import { Button, Section, Table } from '../components';
+import {
+  Button,
+  Dimmer,
+  LabeledList,
+  Section,
+  Stack,
+  Table,
+} from '../components';
 import { NtosWindow } from '../layouts';
 
 type Data = {
@@ -12,6 +19,8 @@ type Data = {
 type FaxInfo = {
   fax_id: string;
   fax_name: string;
+  muted: BooleanLike;
+  new_message: BooleanLike;
 };
 
 export const NtosFaxManager = (props) => {
@@ -47,25 +56,68 @@ export const NtosFaxManager = (props) => {
             {faxes.length === 0
               ? 'No connections'
               : faxes.map((fax: FaxInfo) => (
-                  <Table.Row key={fax.fax_id}>
-                    <Table.Cell collapsing>
-                      {faxes.indexOf(fax) + 1}. {fax.fax_name}
-                    </Table.Cell>
-                    <Table.Cell />
-                    <Table.Cell>{fax.fax_id}</Table.Cell>
-
-                    <Table.Cell collapsing>
-                      <Button
-                        icon="link-slash"
-                        tooltip="Disconnect"
-                        onClick={() => act('disconnect', { id: fax.fax_id })}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
+                  <FaxInfoSection key={fax.fax_id} fax={fax} />
                 ))}
           </Table>
         </Section>
+        {/* {!notification && <FaxDimmer faxes={faxes} />} */}
       </NtosWindow.Content>
     </NtosWindow>
+  );
+};
+
+type FaxDimmerProps = {
+  faxes: FaxInfo[];
+};
+
+const FaxInfoSection = (props) => {
+  const { fax } = props;
+  const { act, data } = useBackend();
+  const color = 'rgba(74, 59, 140, 1)';
+
+  return (
+    <Section
+      title={fax.fax_name}
+      style={{
+        border: `4px solid ${color}`,
+      }}
+    >
+      <Stack>
+        <Stack.Item grow={1} basis={0}>
+          <LabeledList>
+            <LabeledList.Item label="Name">{fax.fax_name}</LabeledList.Item>
+            <LabeledList.Item label="ID">{fax.fax_id}</LabeledList.Item>
+          </LabeledList>
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            fluid
+            icon="link-slash"
+            tooltip="Disconnect"
+            onClick={() => act('disconnect', { id: fax.fax_id })}
+          />
+          <Button
+            icon={true ? 'bell' : 'bell-slash'}
+            iconColor={'white'}
+            tooltip={(true ? 'Disable' : 'Enable') + ' notifications'}
+            color={true ? null : 'red'}
+            onClick={() => act('disable_notification')}
+          />
+        </Stack.Item>
+      </Stack>
+    </Section>
+  );
+};
+
+const FaxDimmer = (props: FaxDimmerProps) => {
+  const faxes = props.faxes;
+  return (
+    <Dimmer>
+      <Stack align="baseline" vertical>
+        <Stack.Item>
+          <Table />
+        </Stack.Item>
+      </Stack>
+    </Dimmer>
   );
 };

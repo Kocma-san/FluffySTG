@@ -75,7 +75,11 @@
 	return TRUE
 
 /datum/computer_file/program/fax_manager/proc/establish_connection(datum/target)
-	connected_faxes += WEAKREF(target)
+	var/list/fax_info = list()
+	fax_info["fax"] = WEAKREF(target)
+	fax_info["muted"] = FALSE
+	fax_info["last_message"] = FALSE
+	connected_faxes[target.fax_id] = fax_info
 	RegisterSignal(target, COMSIG_FAX_MESSAGE_RECEIVED, PROC_REF(send_notification))
 
 /*
@@ -90,12 +94,13 @@
 	var/list/data = list()
 
 	data["faxes"] = list()
-	for(var/datum/weakref/fax_ref in connected_faxes)
-		var/obj/machinery/fax/fax = fax_ref.resolve()
-
+	for(var/list/fax_info in connected_faxes)
 		var/list/fax_data = list()
+		var/obj/machinery/fax/fax = fax_info["fax"].resolve()
 		fax_data["fax_id"] = fax.fax_id
 		fax_data["fax_name"] = fax.fax_name
+		fax_data["muted"] = fax_info["muted"]
+		fax_data["new_message"] = fax_info["new_message"]
 
 		data["faxes"] += list(fax_data)
 
@@ -115,8 +120,12 @@
 					UnregisterSignal(fax, COMSIG_FAX_MESSAGE_RECEIVED)
 			return TRUE
 
-		if("disable_notification")
+		if("disable_all_notification")
 			notification = !notification
+			return TRUE
+
+		if("mute_fax")
+			connected_faxes[fax_id] = !connected_faxes[fax_id]
 			return TRUE
 
 		if("scan_for_faxes")
@@ -139,10 +148,11 @@
 
 	var/obj/machinery/announcement_system/announcement_system = pick(GLOB.announcement_systems)
 
-	var/list/targets
-	for(var/datum/computer_file/program/messenger/messenger_app in computer.stored_files)
-		targets = list(messenger_app)
-		break
+	// for(var/datum/computer_file/program/messenger/messenger_app in computer.stored_files)
+	// 	targets = list(messenger_app)
+	// 	break
+	var/datum/computer_file/program/messenger/messenger_app = locate() in computer.stored_files
+	var/targets = list(messenger_app)
 
 	if(!length(targets))
 		return FALSE
