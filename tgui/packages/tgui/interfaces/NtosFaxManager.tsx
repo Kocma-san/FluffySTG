@@ -97,11 +97,11 @@ const FaxInfoSection = (props) => {
             onClick={() => act('disconnect', { id: fax.fax_id })}
           />
           <Button
-            icon={true ? 'bell' : 'bell-slash'}
+            icon={fax.muted ? 'bell' : 'bell-slash'}
             iconColor={'white'}
-            tooltip={(true ? 'Disable' : 'Enable') + ' notifications'}
-            color={true ? null : 'red'}
-            onClick={() => act('disable_notification')}
+            tooltip={(fax.muted ? 'Disable' : 'Enable') + ' notifications'}
+            color={fax.muted ? null : 'red'}
+            onClick={() => act('mute_fax', { id: fax.fax_id })}
           />
         </Stack.Item>
       </Stack>

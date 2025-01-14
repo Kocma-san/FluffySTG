@@ -74,7 +74,7 @@
 	to_chat(user, span_notice("PDA succesfully linked to this fax"))
 	return TRUE
 
-/datum/computer_file/program/fax_manager/proc/establish_connection(datum/target)
+/datum/computer_file/program/fax_manager/proc/establish_connection(obj/machinery/fax/target)
 	var/list/fax_info = list()
 	fax_info["fax"] = WEAKREF(target)
 	fax_info["muted"] = FALSE
@@ -113,11 +113,9 @@
 
 	switch(action)
 		if("disconnect")
-			for(var/datum/weakref/fax_ref in connected_faxes)
-				var/obj/machinery/fax/fax = fax_ref.resolve()
-				if(fax.fax_id == params["id"])
-					connected_faxes -= fax_ref
-					UnregisterSignal(fax, COMSIG_FAX_MESSAGE_RECEIVED)
+			var/obj/machinery/fax/fax = connected_faxes[params["id"]]["fax"].resolve()
+			UnregisterSignal(fax, COMSIG_FAX_MESSAGE_RECEIVED)
+			connected_faxes -= connected_faxes[params["id"]]
 			return TRUE
 
 		if("disable_all_notification")
@@ -125,7 +123,7 @@
 			return TRUE
 
 		if("mute_fax")
-			connected_faxes[fax_id] = !connected_faxes[fax_id]
+			connected_faxes[params["id"]]["muted"] = !connected_faxes[params["id"]]["muted"]
 			return TRUE
 
 		if("scan_for_faxes")
