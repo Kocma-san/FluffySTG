@@ -26,6 +26,8 @@
 	///Which mood event to give the consious patient when surgery fails. Lasts muuuuuch longer.
 	var/datum/mood_event/surgery/surgery_failure_mood_event = /datum/mood_event/surgery/failure
 
+	var/infection_prob = 0.5
+
 
 /datum/surgery_step/proc/try_op(mob/user, mob/living/target, target_zone, obj/item/tool, datum/surgery/surgery, try_to_fail = FALSE)
 	var/success = FALSE
@@ -179,6 +181,34 @@
 
 	if(target.stat == DEAD && was_sleeping && user.client)
 		user.client.give_award(/datum/award/achievement/jobs/sandman, user)
+
+	// FLUFFY FRONTIER ADDITION BEGIN - surgery_if_sepsis_was_real
+	var/infection_prob = 0.1
+	infection_prob /= implement_speed_mod	// Проверям на инструмент. Гетто инструменты имеют больший шанс на заражение
+	infection_prob /= get_location_modifier(target)	// Такая же глупая проврека на то, где проводится операция
+	var/list/visible_obj = view(1)
+	var/dirt_infection_mult = 1
+	for(var/obj/effect/decal/cleanable/contagious_dirt in visible_obj)
+		var/decal_mult = 1
+		if(istype(contagious_dirt, /obj/effect/decal/cleanable/dirt))
+			decal_mult = 2
+		else if(istype(contagious_dirt, /obj/effect/decal/cleanable/blood))
+			decal_mult = 3
+		else if(istype(contagious_dirt, /obj/effect/decal/cleanable/xenoblood))
+			decal_mult = 2
+		else if(istype(contagious_dirt, /obj/effect/decal/cleanable/vomit))
+			decal_mult = 5
+		else
+			decal_mult = 2
+		dirt_infection_mult = max(dirt_infection_mult * decal_mult, 20)
+	infection_prob *= dirt_infection_mult
+	// list(/obj/effect/decal/cleanable/dirt, /obj/effect/decal/cleanable/blood, /obj/effect/decal/cleanable/vomit)
+	infection_prob /= 1 + max(surgery.speed_modifier * 3, 2)
+	message_admins("Inf prob: [infection_prob]")
+	if(prob(infection_prob))
+		target.ForceContractDisease(new /datum/disease/flu, FALSE, TRUE)
+
+	// FLUFFY FRONTIER ADDITION END
 
 	surgery.step_in_progress = FALSE
 	return advance

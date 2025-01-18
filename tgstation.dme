@@ -8915,6 +8915,7 @@
 #include "tff_modular\modules\security-rearm\code\security_beacon.dm"
 #include "tff_modular\modules\security-rearm\code\wespe.dm"
 #include "tff_modular\modules\selestial_language\language.dm"
+#include "tff_modular\modules\sepsis\check_proc.dm"
 #include "tff_modular\modules\sepsis\sepsis_disease.dm"
 #include "tff_modular\modules\sepsis\sepsis_giving.dm"
 #include "tff_modular\modules\silicon_laws_tweaks\code\upload.dm"
