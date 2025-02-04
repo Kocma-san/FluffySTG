@@ -97,6 +97,10 @@
 	var/fail_prob = 0//100 - fail_prob = success_prob
 	var/advance = FALSE
 
+	// FLUFFY FRONTIER ADDITION START - PAIN_SYSTEM
+	//var/pain_failure_chance = target.pain?.feels_pain ? max(0, (surgery.pain_reduction_required - target.pain.reduction_pain) * 2) : 0
+	// FLUFFY FRONTIER ADDITION END
+
 	if(!chem_check(target))
 		user.balloon_alert(user, "missing [LOWER_TEXT(get_chem_list())]!")
 		to_chat(user, span_warning("[target] is missing the [LOWER_TEXT(get_chem_list())] required to perform this surgery step!"))
@@ -158,6 +162,14 @@
 		to_chat(user, span_notice("You are able to work faster due to the quiet environment!"))
 	// NOVA EDIT ADDITION END
 	if(do_after(user, modded_time, target = target, interaction_key = user.has_status_effect(/datum/status_effect/hippocratic_oath) ? target : DOAFTER_SOURCE_SURGERY)) //If we have the hippocratic oath, we can perform one surgery on each target, otherwise we can only do one surgery in total.
+		// FLUFFY FRONTIER ADDITION START - not all painkillers will be enough to not feel pain
+		/*
+		if(target.stat == CONSCIOUS && prob(pain_failure_chance))
+			try_to_fail = TRUE
+			to_chat(user, span_notice("[target] moved during the surgery! Use anesthetics or painkillers!"))
+			target.emote("pain")
+		*/
+		// FLUFFY FRONTIER ADDITION END
 
 		if((prob(100-fail_prob) || (iscyborg(user) && !silicons_obey_prob)) && !try_to_fail)
 			if(success(user, target, target_zone, tool, surgery))
