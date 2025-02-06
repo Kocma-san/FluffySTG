@@ -21,7 +21,6 @@ type FaxInfo = {
   fax_id: string;
   fax_name: string;
   muted: BooleanLike;
-  new_message: BooleanLike;
 };
 
 export const NtosFaxManager = (props) => {

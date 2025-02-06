@@ -14,7 +14,7 @@
 	can_run_on_flags = PROGRAM_PDA
 
 	// list of weakrefs of faxes connected to this app
-	var/list/connected_faxes = list()
+	var/list/connected_faxes = list()	// connected_faxes = list("fax_id" = list("faxref" = weakref/fax, "muted" = muted, "last_message" = last_message))
 
 	var/max_connections = FAX_APP_MAX_CONNECTIONS
 
@@ -52,35 +52,46 @@
 	return TRUE
 
 /datum/computer_file/program/fax_manager/Destroy()
-	for(var/datum/weakref/fax_ref in connected_faxes)
-		UnregisterSignal(fax_ref.resolve(), COMSIG_FAX_MESSAGE_RECEIVED)
+	for(var/list/fax_info in connected_faxes)
+		UnregisterSignal(fax_info["faxref"].resolve(), COMSIG_FAX_MESSAGE_RECEIVED)
 	return ..()
 
-/datum/computer_file/program/fax_manager/proc/connect_fax(datum/target, mob/user)
-	if(!istype(target, /obj/machinery/fax))
+/datum/computer_file/program/fax_manager/proc/connect_fax(obj/machinery/fax/target, mob/user)
+	if(!istype(target))
 		return FALSE
 
-	var/datum/weakref/fax_ref = WEAKREF(target)
-
-	if(fax_ref in connected_faxes)
+	if(target.fax_id in connected_faxes)
 		to_chat(user, span_notice("PDA is already connected to this fax"))
 		return FALSE
 
 	if(length(connected_faxes) >= max_connections)
-		to_chat(user, span_warning("Too many PDAs are linked to this fax!"))
+		to_chat(user, span_warning("Too many faxes are linked to this PDA!"))
 		return FALSE
 
-	establish_connection(target, user)
-	to_chat(user, span_notice("PDA succesfully linked to this fax"))
+	establish_connection(target, force = TRUE)
+
+/datum/computer_file/program/fax_manager/proc/establish_connection(obj/machinery/fax/target, force = FALSE)
+	if(!istype(target))
+		return FALSE
+
+	if(!force)
+		if(target.fax_id in connected_faxes)
+			return FALSE
+
+		if(length(connected_faxes) >= max_connections)
+			return FALSE
+
+	var/list/fax_info = list()
+	fax_info["faxref"] = WEAKREF(target)
+	fax_info["muted"] = FALSE
+
+	connected_faxes[target.fax_id] = fax_info
 	return TRUE
 
-/datum/computer_file/program/fax_manager/proc/establish_connection(obj/machinery/fax/target)
-	var/list/fax_info = list()
-	fax_info["fax"] = WEAKREF(target)
-	fax_info["muted"] = FALSE
-	fax_info["last_message"] = FALSE
-	connected_faxes[target.fax_id] = fax_info
-	RegisterSignal(target, COMSIG_FAX_MESSAGE_RECEIVED, PROC_REF(send_notification))
+/datum/computer_file/program/fax_manager/proc/remove_connection(obj/machinery/fax/target)
+	UnregisterSignal(target, COMSIG_FAX_MESSAGE_RECEIVED)
+	connected_faxes[target.fax_id] = null
+	list_clear_nulls(connected_faxes)
 
 /*
 /datum/computer_file/program/fax_manager/on_start(mob/user)
@@ -96,11 +107,12 @@
 	data["faxes"] = list()
 	for(var/list/fax_info in connected_faxes)
 		var/list/fax_data = list()
-		var/obj/machinery/fax/fax = fax_info["fax"].resolve()
+
+		var/datum/weakref/fax_ref = fax_info["faxref"]
+		var/obj/machinery/fax/fax = fax_ref.resolve()
 		fax_data["fax_id"] = fax.fax_id
 		fax_data["fax_name"] = fax.fax_name
 		fax_data["muted"] = fax_info["muted"]
-		fax_data["new_message"] = fax_info["new_message"]
 
 		data["faxes"] += list(fax_data)
 
@@ -113,9 +125,9 @@
 
 	switch(action)
 		if("disconnect")
-			var/obj/machinery/fax/fax = connected_faxes[params["id"]]["fax"].resolve()
-			UnregisterSignal(fax, COMSIG_FAX_MESSAGE_RECEIVED)
-			connected_faxes -= connected_faxes[params["id"]]
+			var/datum/weakref/fax_ref = connected_faxes[params["id"]]["faxref"]
+			var/obj/machinery/fax/target = fax_ref.resolve()
+			remove_connection(target)
 			return TRUE
 
 		if("disable_all_notification")
@@ -127,35 +139,27 @@
 			return TRUE
 
 		if("scan_for_faxes")
-			for (var/elem in view(1, usr))
-				if (istype(elem, /obj/machinery/fax))
+			for(var/elem in view(1, usr))
+				if(istype(elem, /obj/machinery/fax))
 					connect_fax(elem, usr)
 			return TRUE
 
 /datum/computer_file/program/fax_manager/proc/send_notification(obj/machinery/fax/fax, obj/item/loaded, sender_name)
 	SIGNAL_HANDLER
 
-	if(!istype(fax))
-		return FALSE
-
 	if(!notification)
 		return FALSE
 
-	if(!length(GLOB.announcement_systems))
+	if(!istype(fax))
 		return FALSE
 
-	var/obj/machinery/announcement_system/announcement_system = pick(GLOB.announcement_systems)
-
-	// for(var/datum/computer_file/program/messenger/messenger_app in computer.stored_files)
-	// 	targets = list(messenger_app)
-	// 	break
 	var/datum/computer_file/program/messenger/messenger_app = locate() in computer.stored_files
 	var/targets = list(messenger_app)
 
 	if(!length(targets))
 		return FALSE
 
-	var/datum/signal/subspace/messaging/tablet_message/signal = new(announcement_system, list(
+	var/datum/signal/subspace/messaging/tablet_message/signal = new(fax, list(
 		"fakename" = fax.fax_name,
 		"fakejob" = "Fax",
 		"message" = "New message received from [sender_name]!",
