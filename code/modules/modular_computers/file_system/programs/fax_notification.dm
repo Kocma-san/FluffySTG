@@ -52,8 +52,9 @@
 	return TRUE
 
 /datum/computer_file/program/fax_manager/Destroy()
-	for(var/list/fax_info in connected_faxes)
-		UnregisterSignal(fax_info["faxref"].resolve(), COMSIG_FAX_MESSAGE_RECEIVED)
+	for(var/fax_id in connected_faxes)
+		var/datum/weakref/fax_ref = connected_faxes[fax_id]["faxref"]
+		UnregisterSignal(fax_ref.resolve(), COMSIG_FAX_MESSAGE_RECEIVED)
 	return ..()
 
 /datum/computer_file/program/fax_manager/proc/connect_fax(obj/machinery/fax/target, mob/user)
@@ -86,12 +87,18 @@
 	fax_info["muted"] = FALSE
 
 	connected_faxes[target.fax_id] = fax_info
+	RegisterSignal(target, COMSIG_FAX_MESSAGE_RECEIVED, PROC_REF(send_notification))
 	return TRUE
 
 /datum/computer_file/program/fax_manager/proc/remove_connection(obj/machinery/fax/target)
 	UnregisterSignal(target, COMSIG_FAX_MESSAGE_RECEIVED)
 	connected_faxes[target.fax_id] = null
 	list_clear_nulls(connected_faxes)
+
+/datum/computer_file/program/fax_manager/proc/remove_connection_by_id(fax_id)
+	var/datum/weakref/fax_ref = connected_faxes[fax_id]["faxref"]
+	var/obj/machinery/fax/target = fax_ref.resolve()
+	remove_connection(target)
 
 /*
 /datum/computer_file/program/fax_manager/on_start(mob/user)
@@ -105,11 +112,13 @@
 	var/list/data = list()
 
 	data["faxes"] = list()
-	for(var/list/fax_info in connected_faxes)
-		var/list/fax_data = list()
+	for(var/fax_id in connected_faxes)
+		var/list/fax_info = connected_faxes[fax_id]
 
 		var/datum/weakref/fax_ref = fax_info["faxref"]
 		var/obj/machinery/fax/fax = fax_ref.resolve()
+
+		var/list/fax_data = list()
 		fax_data["fax_id"] = fax.fax_id
 		fax_data["fax_name"] = fax.fax_name
 		fax_data["muted"] = fax_info["muted"]
@@ -125,9 +134,7 @@
 
 	switch(action)
 		if("disconnect")
-			var/datum/weakref/fax_ref = connected_faxes[params["id"]]["faxref"]
-			var/obj/machinery/fax/target = fax_ref.resolve()
-			remove_connection(target)
+			remove_connection_by_id(params["id"])
 			return TRUE
 
 		if("disable_all_notification")
@@ -147,10 +154,13 @@
 /datum/computer_file/program/fax_manager/proc/send_notification(obj/machinery/fax/fax, obj/item/loaded, sender_name)
 	SIGNAL_HANDLER
 
+	if(!istype(fax))
+		return FALSE
+
 	if(!notification)
 		return FALSE
 
-	if(!istype(fax))
+	if(connected_faxes[fax.fax_id]["muted"])
 		return FALSE
 
 	var/datum/computer_file/program/messenger/messenger_app = locate() in computer.stored_files
