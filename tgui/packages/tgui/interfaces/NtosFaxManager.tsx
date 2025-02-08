@@ -34,7 +34,7 @@ export const NtosFaxManager = (props) => {
           buttons={
             <>
               <Button
-                icon={notification ? 'bell' : 'bell-slash'}
+                icon={notification ? 'bell-slash' : 'bell'}
                 iconColor={'white'}
                 tooltip={
                   notification
@@ -42,7 +42,7 @@ export const NtosFaxManager = (props) => {
                     : 'Enable notifications'
                 }
                 color={notification ? null : 'red'}
-                onClick={() => act('disable_notification')}
+                onClick={() => act('disable_all_notification')}
               />
               <Button
                 icon={'right-to-bracket'}
