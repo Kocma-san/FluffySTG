@@ -1,6 +1,7 @@
 import {
   Button,
   Dimmer,
+  Icon,
   LabeledList,
   Section,
   Stack,
@@ -26,6 +27,7 @@ type FaxInfo = {
 export const NtosFaxManager = (props) => {
   const { act, data } = useBackend<Data>();
   const { faxes, notification } = data;
+
   return (
     <NtosWindow width={400} height={400}>
       <NtosWindow.Content>
@@ -47,7 +49,9 @@ export const NtosFaxManager = (props) => {
               <Button
                 icon={'right-to-bracket'}
                 tooltip={'Scan for faxes'}
-                onClick={() => act('scan_for_faxes')}
+                onClick={() => {
+                  act('scan_for_faxes');
+                }}
               />
             </>
           }
@@ -60,14 +64,9 @@ export const NtosFaxManager = (props) => {
                 ))}
           </Table>
         </Section>
-        {/* {!notification && <FaxDimmer faxes={faxes} />} */}
       </NtosWindow.Content>
     </NtosWindow>
   );
-};
-
-type FaxDimmerProps = {
-  faxes: FaxInfo[];
 };
 
 const FaxInfoSection = (props) => {
@@ -111,15 +110,73 @@ const FaxInfoSection = (props) => {
   );
 };
 
-const FaxDimmer = (props: FaxDimmerProps) => {
-  const faxes = props.faxes;
+// Однажды я доделаю...
+
+const FaxDimmer = (props: number) => {
   return (
     <Dimmer>
       <Stack align="baseline" vertical>
-        <Stack.Item>
-          <Table />
-        </Stack.Item>
+        {props === 0 && <DimmerContentLoading />}
+        {props === 1 && <DimmerContentSuccess />}
+        {props === 2 && <DimmerContentAlreadyConnected />}
+        {props === 3 && <DimmerContentManyFaxes />}
+        {props === 4 && <DimmerContentNoFound />}
       </Stack>
     </Dimmer>
+  );
+};
+
+const DimmerContentLoading = (props) => {
+  return (
+    <>
+      <Stack.Item>
+        <Icon color="white" name="rotate" spin size={4} />
+      </Stack.Item>
+      <Stack.Item>Connecting...</Stack.Item>
+    </>
+  );
+};
+
+const DimmerContentSuccess = (props) => {
+  return (
+    <>
+      <Stack.Item>
+        <Icon color="white" name="link" size={4} />
+      </Stack.Item>
+      <Stack.Item>Successfully connected!</Stack.Item>
+    </>
+  );
+};
+
+const DimmerContentNoFound = (props) => {
+  return (
+    <>
+      <Stack.Item>
+        <Icon color="white" name="triangle-exclamation" size={4} />
+      </Stack.Item>
+      <Stack.Item>Fax not found!</Stack.Item>
+    </>
+  );
+};
+
+const DimmerContentManyFaxes = (props) => {
+  return (
+    <>
+      <Stack.Item>
+        <Icon color="white" name="triangle-exclamation" size={4} />
+      </Stack.Item>
+      <Stack.Item>Too many faxes connected!</Stack.Item>
+    </>
+  );
+};
+
+const DimmerContentAlreadyConnected = (props) => {
+  return (
+    <>
+      <Stack.Item>
+        <Icon color="white" name="triangle-exclamation" size={4} />
+      </Stack.Item>
+      <Stack.Item>This fax is already connected!</Stack.Item>
+    </>
   );
 };

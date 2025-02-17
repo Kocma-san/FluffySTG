@@ -70,6 +70,7 @@
 		return FALSE
 
 	establish_connection(target, force = TRUE)
+	return TRUE
 
 /datum/computer_file/program/fax_manager/proc/establish_connection(obj/machinery/fax/target, force = FALSE)
 	if(!istype(target))
@@ -147,8 +148,11 @@
 
 		if("scan_for_faxes")
 			for(var/elem in view(1, usr))
-				if(istype(elem, /obj/machinery/fax))
-					connect_fax(elem, usr)
+				if(!istype(elem, /obj/machinery/fax))
+					continue
+				if(connect_fax(elem, usr))
+					break
+
 			return TRUE
 
 /datum/computer_file/program/fax_manager/proc/send_notification(obj/machinery/fax/fax, obj/item/loaded, sender_name)
