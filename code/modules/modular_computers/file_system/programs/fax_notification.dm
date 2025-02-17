@@ -13,8 +13,7 @@
 	program_icon = FA_ICON_FAX
 	can_run_on_flags = PROGRAM_PDA
 
-	// list of weakrefs of faxes connected to this app
-	var/list/connected_faxes = list()	// connected_faxes = list("fax_id" = list("faxref" = weakref/fax, "muted" = muted, "last_message" = last_message))
+	var/list/connected_faxes = list()	// connected_faxes = list("fax_id" = list("faxref" = weakref/fax, "muted" = bool, "last_message" = bool))
 
 	var/max_connections = FAX_APP_MAX_CONNECTIONS
 
