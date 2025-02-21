@@ -7,7 +7,6 @@ import {
   Section,
   Stack,
   Table,
-  Tooltip,
 } from 'tgui-core/components';
 import { formatMoney } from 'tgui-core/format';
 
@@ -88,8 +87,7 @@ function CheckoutItems(props) {
               <>
                 <Button
                   icon="minus"
-                  disabled={entry.dep_order}
-                  onClick={() => act('remove', { order_name: entry.id })}
+                  onClick={() => act('remove', { order_name: entry.object })}
                 />
                 <RestrictedInput
                   width={5}
@@ -105,11 +103,7 @@ function CheckoutItems(props) {
                 />
                 <Button
                   icon="plus"
-                  disabled={
-                    amount_by_name[entry.object] >= max_order ||
-                    entry.paid ||
-                    entry.dep_order
-                  }
+                  disabled={amount_by_name[entry.object] >= max_order}
                   onClick={() =>
                     act('add_by_name', { order_name: entry.object })
                   }
@@ -121,24 +115,8 @@ function CheckoutItems(props) {
           </Table.Cell>
 
           <Table.Cell collapsing color="average">
-            {!!entry.paid && (
-              <Tooltip
-                position="bottom"
-                content={
-                  'Paid by ' + entry.orderer + ' (' + entry.orderer_rank + ')'
-                }
-              >
-                <b>[Paid Privately x {entry.paid}]</b>
-              </Tooltip>
-            )}
-            {!!entry.dep_order && (
-              <Tooltip
-                position="bottom"
-                content={'Ordered by ' + entry.dep_name}
-              >
-                <b>[Departmental order]</b>
-              </Tooltip>
-            )}
+            {!!entry.paid && <b>[Private x {entry.paid}]</b>}
+            {!!entry.dep_order && <b>[Department x {entry.dep_order}]</b>}
           </Table.Cell>
 
           <Table.Cell collapsing color="gold" textAlign="right">
