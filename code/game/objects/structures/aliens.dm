@@ -245,7 +245,10 @@
 	qdel(src)
 
 /obj/structure/alien/weeds/should_atmos_process(datum/gas_mixture/air, exposed_temperature)
-	return exposed_temperature > 300
+	// FLUFFY FRONTIER EDIT START - xenomorph rebalance
+	// ORIGINAL LINE: return exposed_temperature > 300
+	return exposed_temperature > 350
+	// FLUFFY FRONTIER EDIT END
 
 /obj/structure/alien/weeds/atmos_expose(datum/gas_mixture/air, exposed_temperature)
 	take_damage(5, BURN, 0, 0)
