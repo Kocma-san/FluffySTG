@@ -17,14 +17,13 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 	var/phone_name = "Telephone"
 	var/phone_icon
 
-	var/obj/item/tube_phone/attached_to
+	var/phone_type = /obj/item/tube_phone
+	var/obj/item/tube_phone/attached_handset
 
 	var/obj/structure/transmitter/outbound_call
 	var/obj/structure/transmitter/inbound_call
 
 	var/next_ring = 0
-
-	var/phone_type = /obj/item/tube_phone
 
 	var/range = 6
 
@@ -56,28 +55,21 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 	if(!phone_id)
 		phone_id = assign_random_name()
 
-	attached_to = new phone_type(src)
+	var/obj/item/tube_phone/handset = new phone_type(src)
+	attach_handset(handset)
 
 	history = new(src)
-
-	outring_loop = new(attached_to)
-	busy_loop = new(attached_to)
-	hangup_loop = new(attached_to)
-
-	if(!get_turf(src))
-		return
 
 	GLOB.phone_transmitters += src
 	RegisterSignal(src, COMSIG_ATOM_TETHER_SNAPPED, PROC_REF(handle_snap))
 	update_icon()
 
 /obj/structure/transmitter/Destroy()
-	if(attached_to)
-		if(attached_to.loc == src)
-			qdel(attached_to)
-		else
-			attached_to.attached_to = null
-		attached_to = null
+	if(attached_handset)
+		var/need_deletion = FALSE
+		if(attached_handset.loc == src)
+			need_deletion = TRUE
+		detach_handset(need_deletion)
 
 	GLOB.phone_transmitters -= src
 	reset_call(silent = TRUE)
@@ -87,7 +79,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 /obj/structure/transmitter/update_icon()
 	. = ..()
 	SEND_SIGNAL(src, COMSIG_TRANSMITTER_UPDATE_ICON)
-	if(attached_to.loc != src)
+	if(attached_handset.loc != src)
 		icon_state = "[base_icon_state]_ear"
 		return
 
@@ -101,12 +93,40 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 	if(snapped)
 		. += span_bold("Looks like the cable on the phone is broken. Probably can be fixed with a couple of wires.")
 
+/obj/structure/transmitter/proc/attach_handset(obj/item/tube_phone/handset)
+	if(!istype(handset))
+		return FALSE
+	if(handset.connected_phone)
+		return FALSE
+
+	attached_handset = handset
+	handset.on_attach_phone(src)
+
+	outring_loop = new(attached_handset)
+	busy_loop = new(attached_handset)
+	hangup_loop = new(attached_handset)
+
+/obj/structure/transmitter/proc/detach_handset(need_delete = FALSE)
+	if(!attached_handset)
+		return FALSE
+
+	attached_handset.on_detach_phone()
+
+	qdel(outring_loop)
+	qdel(busy_loop)
+	qdel(hangup_loop)
+
+	if(need_delete)
+		qdel(attached_handset)
+
+	attached_handset = null
+
 /obj/structure/transmitter/proc/get_status(public = FALSE)
 	if(!enabled)
 		return PHONE_UNAVAILABLE
-	if(!attached_to || snapped)
+	if(!attached_handset || snapped)
 		return PHONE_UNAVAILABLE
-	if(get_calling_phone() || attached_to.loc != src)
+	if(get_calling_phone() || attached_handset.loc != src)
 		return PHONE_BUSY
 	if((do_not_disturb == PHONE_DND_ON) || (do_not_disturb == PHONE_DND_FORCED))
 		return PHONE_BUSY
@@ -138,7 +158,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 
 /obj/structure/transmitter/ui_status(mob/user, datum/ui_state/state)
 	. = ..()
-	if(!get_status() || get_calling_phone() || (attached_to.loc != src))
+	if(!get_status() || get_calling_phone() || (attached_handset.loc != src))
 		return UI_CLOSE
 
 /obj/structure/transmitter/ui_interact(mob/user, datum/tgui/ui)
@@ -201,7 +221,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 		return FALSE
 	if(!ishuman(user))
 		return FALSE
-	if(!attached_to || attached_to.loc != src)
+	if(!attached_handset || attached_handset.loc != src)
 		return FALSE
 	if(snapped)
 		balloon_alert(user, "cable is broken!")
@@ -221,11 +241,11 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 			return
 		CRASH("Something wrong in /obj/structure/transmitter/interact. get_calling_phone() returned null, but it should have returned the transmitter")
 
-	if(T.attached_to)
-		if(ismob(T.attached_to.loc))
-			var/mob/M = T.attached_to.loc
+	if(T.attached_handset)
+		if(ismob(T.attached_handset.loc))
+			var/mob/M = T.attached_handset.loc
 			to_chat(M, span_purple("[icon2html(src, M)] [phone_name] has picked up."))
-		playsound(T.attached_to, 'tff_modular/modules/colonial_marines/telephone/sound/remote_pickup.ogg', 20)
+		playsound(T.attached_handset, 'tff_modular/modules/colonial_marines/telephone/sound/remote_pickup.ogg', 20)
 
 	if(T.timeout_timer_id)
 		deltimer(T.timeout_timer_id)
@@ -236,11 +256,11 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 	to_chat(user, span_purple("[icon2html(src, user)] Picked up a call from [T.phone_name]."))
 	playsound(get_turf(user), get_sound_file("rtb_handset"), 100)
 
-	attached_to.attempt_pickup(user)
+	attached_handset.attempt_pickup(user)
 	update_icon()
 
 /obj/structure/transmitter/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
-	if(tool == attached_to)
+	if(tool == attached_handset)
 		recall_phone()
 		return ITEM_INTERACT_SUCCESS
 	if(istype(tool, /obj/item/stack/cable_coil))
@@ -260,30 +280,24 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 		transmitters -= calling
 		CRASH("Qdelled/improper atom inside transmitters list! (istype returned: [istype(calling)], QDELETED returned: [QDELETED(calling)])")
 
-	outring_loop.start()
-	to_chat(user, span_purple("[icon2html(src, user)] Dialing [calling.phone_name].."))
-
-	attached_to.attempt_pickup(user)
+	attached_handset.attempt_pickup(user)
 	playsound(get_turf(user), get_sound_file("rtb_handset"), 100)
+	outring_loop.start()
 
+	to_chat(user, span_purple("[icon2html(src, user)] Dialing [calling.phone_name].."))
+	timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(try_connect), user, calling), 3 SECONDS, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_STOPPABLE)
+
+/obj/structure/transmitter/proc/try_connect(mob/living/carbon/human/user, obj/structure/transmitter/calling)
 	var/calling_status = calling.get_status(only_outcome || only_income)
 	switch(calling_status)
 		if(PHONE_UNAVAILABLE, PHONE_BUSY)
-			timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(reset_call), PHONE_REASON_BUSY), 3 SECONDS, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_STOPPABLE)
+			reset_call(PHONE_REASON_BUSY)
 		if(PHONE_AVAILABLE)
-			timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(try_connect), user, calling), 3 SECONDS, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_STOPPABLE)
+			connect(user, calling)
 
 	history.add_outbound_call(calling.phone_id)
 
-	START_PROCESSING(SSobj, src)
-
-/obj/structure/transmitter/proc/try_connect(mob/living/carbon/human/user, obj/structure/transmitter/calling)
-	var/calling_status = calling.get_status()
-	switch(calling_status)
-		if(PHONE_UNAVAILABLE, PHONE_BUSY)
-			reset_call(PHONE_REASON_BUSY)
-			return
-
+/obj/structure/transmitter/proc/connect(mob/living/carbon/human/user, obj/structure/transmitter/calling)
 	outbound_call = calling
 	calling.inbound_call = src
 
@@ -292,6 +306,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 	timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(reset_call), PHONE_REASON_TIMEOUT), timeout_duration, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_STOPPABLE)
 
 	calling.update_icon()
+	START_PROCESSING(SSobj, src)
 	START_PROCESSING(SSobj, calling)
 
 /obj/structure/transmitter/proc/reset_call(reason = PHONE_REASON_NO, silent = FALSE)
@@ -299,21 +314,21 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 
 	if(!silent)
 		if(active_call)
-			if(active_call.attached_to && ismob(active_call.attached_to.loc))
-				var/mob/M = active_call.attached_to.loc
+			if(active_call.attached_handset && ismob(active_call.attached_handset.loc))
+				var/mob/M = active_call.attached_handset.loc
 				to_chat(M, span_purple("[icon2html(src, M)] [phone_name] has hung up on you."))
 				active_call.hangup_loop.start()
 
-			if(attached_to && ismob(attached_to.loc))
-				var/mob/M = attached_to.loc
+			if(attached_handset && ismob(attached_handset.loc))
+				var/mob/M = attached_handset.loc
 				switch(reason)
 					if(PHONE_REASON_TIMEOUT)
 						to_chat(M, span_purple("[icon2html(src, M)] Your call to [active_call.phone_name] has reached voicemail, nobody picked up the phone."))
 					if(PHONE_REASON_NO)
 						to_chat(M, span_purple("[icon2html(src, M)] You have hung up on [active_call.phone_name]."))
 
-		if((reason == PHONE_REASON_BUSY) && attached_to && ismob(attached_to.loc))
-			var/mob/M = attached_to.loc
+		if((reason == PHONE_REASON_BUSY) && attached_handset && ismob(attached_handset.loc))
+			var/mob/M = attached_handset.loc
 			to_chat(M, span_purple("[icon2html(src, M)] The station you are trying to reach is currently busy, please hang on and try again later."))
 
 		switch(reason)
@@ -356,35 +371,21 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 
 /obj/structure/transmitter/process()
 	if(inbound_call)
-		if(!attached_to)
+		if(!attached_handset)
 			STOP_PROCESSING(SSobj, src)
 			return
 
-		if(attached_to.loc == src)
+		if(attached_handset.loc == src)
 			if(next_ring < world.time)
 				playsound(loc, 'tff_modular/modules/colonial_marines/telephone/sound/telephone_ring.ogg', 75)
 				visible_message(span_warning("[src] rings vigorously!"))
 				next_ring = world.time + 3 SECONDS
-
-	else if(outbound_call)
-		var/obj/structure/transmitter/T = get_calling_phone()
-		if(!T)
-			STOP_PROCESSING(SSobj, src)
-			return
-
-		var/obj/item/tube_phone/P = T.attached_to
-
-		if(P && attached_to.loc == src && P.loc == T && next_ring < world.time)
-			playsound(get_turf(attached_to), 'tff_modular/modules/colonial_marines/telephone/sound/telephone_ring.ogg', 20, FALSE, 14)
-			visible_message(span_warning("[src] rings vigorously!"))
-			next_ring = world.time + 3 SECONDS
-
 	else
 		STOP_PROCESSING(SSobj, src)
 		return
 
 /obj/structure/transmitter/proc/recall_phone()
-	attached_to.forceMove(src)
+	attached_handset.forceMove(src)
 	reset_call()
 
 	playsound(src, get_sound_file("rtb_handset"), 100, FALSE, 7)
@@ -399,7 +400,6 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 		return outbound_call
 	else if(inbound_call)
 		return inbound_call
-
 	return
 
 /obj/structure/transmitter/proc/handle_speak(message, datum/language/L, mob/speaking)
@@ -410,13 +410,13 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 	if(!istype(T))
 		return
 
-	var/obj/item/tube_phone/P = T.attached_to
+	var/obj/item/tube_phone/P = T.attached_handset
 
-	if(!P || !attached_to)
+	if(!P || !attached_handset)
 		return
 
 	P.handle_hear(message, L, speaking, src)
-	attached_to.handle_hear(message, L, speaking, src)
+	attached_handset.handle_hear(message, L, speaking, src)
 	playsound(P, get_sound_file("talk_phone"), 5)
 	log_say("TELEPHONE: [key_name(speaking)] on Phone '[phone_name]' to '[T.phone_name]' said '[message]'")
 
@@ -431,7 +431,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 
 	if(!snapped)
 		return FALSE
-	if(attached_to.loc != src)
+	if(attached_handset.loc != src)
 		balloon_alert(user, "the phone handset should be here!")
 		return FALSE
 	if(!cable.tool_start_check(user, amount = 5))
@@ -486,39 +486,44 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 
 	w_class = WEIGHT_CLASS_BULKY
 
-	var/obj/structure/transmitter/attached_to
+	var/obj/structure/transmitter/connected_phone
 
 	var/raised = FALSE
 
 /obj/item/tube_phone/Initialize(mapload)
 	. = ..()
-	if(istype(loc, /obj/structure/transmitter))
-		attach_to(loc)
+	become_hearing_sensitive(ROUNDSTART_TRAIT)
 
 /obj/item/tube_phone/Destroy()
-	remove_attached()
+	on_detach_phone()
 	return ..()
 
-/obj/item/tube_phone/proc/attach_to(obj/structure/transmitter/to_attach)
+/obj/item/tube_phone/proc/on_attach_phone(obj/structure/transmitter/to_attach)
 	if(!istype(to_attach))
 		return
-	if(attached_to)
-		remove_attached()
-	attached_to = to_attach
+	if(connected_phone)
+		return
+	connected_phone = to_attach
+	ADD_TRAIT(src, TRAIT_NO_STORAGE_INSERT, "transmitter_attached")
 
-/obj/item/tube_phone/proc/remove_attached()
-	attached_to.attached_to = null
-	attached_to = null
-	reset_tether()
+/obj/item/tube_phone/proc/on_detach_phone()
+	connected_phone = null
+	reset_tether()	// Заменить на ремув_тетер !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	REMOVE_TRAIT(src, TRAIT_NO_STORAGE_INSERT, "transmitter_attached")
+
+
+/obj/item/tube_phone/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
+	. = ..()
+
 
 /obj/item/tube_phone/proc/handle_speak(datum/source, list/speech_args)
 	SIGNAL_HANDLER
 
-	if(!attached_to || loc == attached_to)
+	if(!connected_phone || loc == connected_phone)
 		UnregisterSignal(usr, COMSIG_MOB_SAY)
 		return
 
-	attached_to.handle_speak(speech_args[SPEECH_MESSAGE], speech_args[SPEECH_LANGUAGE], source)
+	connected_phone.handle_speak(speech_args[SPEECH_MESSAGE], speech_args[SPEECH_LANGUAGE], source)
 
 /obj/item/tube_phone/proc/handle_hear(raw_message, datum/language/L, mob/speaking, obj/structure/transmitter/source)
 	var/spans = "purple"
@@ -527,12 +532,16 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 
 	var/list/hearers = list()
 
-	if(source == attached_to)
+	if(source == connected_phone)
 		if(loc != speaking)
 			return
 		hearers += speaking
 	else
 		hearers = get_hearers_in_view(1, src)
+
+	// send_message как /datum/action/cooldown/spell/pointed/telepathy/proc/send_thought + рунчат
+	// попробовать убрать сигнал, а вместо него talk_into
+	// убрать спан размера, если слышит сам себя
 
 	for(var/mob/hearer in hearers)
 		if(HAS_TRAIT(hearer, TRAIT_DEAF))
@@ -554,34 +563,25 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 		set_raised(TRUE, user)
 		to_chat(user, span_notice("You raise [src] to your ear."))
 
-/obj/item/tube_phone/proc/set_raised(to_raise, mob/living/carbon/human/H)
-	if(!istype(H))
+/obj/item/tube_phone/proc/set_raised(to_raise, mob/living/carbon/human/user)
+	if(!istype(user))
 		return
-
-	var/obj/item/radio/R = H.get_item_by_slot(ITEM_SLOT_EARS)
-	if(!istype(R))
-		R = null
 
 	if(!to_raise)
 		raised = FALSE
 		inhand_icon_state = "rpb_phone"
-		R?.set_on(TRUE)
 	else
 		raised = TRUE
 		inhand_icon_state = "rpb_phone_ear"
-		R?.set_on(FALSE)
 
-	H.update_held_items()
+	user.update_held_items()
 
 /obj/item/tube_phone/dropped(mob/user)
 	. = ..()
 	UnregisterSignal(user, COMSIG_MOB_SAY)
 	set_raised(FALSE, user)
 
-/obj/item/tube_phone/on_enter_storage(obj/item/storage/S)
-	. = ..()
-	if(attached_to)
-		attached_to.recall_phone()
+// cable prevents to place in storage) if !snapped
 
 /obj/item/tube_phone/forceMove(atom/dest)
 	. = ..()
@@ -591,34 +591,34 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 		RegisterSignal(dest, COMSIG_MOB_SAY, PROC_REF(handle_speak))
 
 /obj/item/tube_phone/proc/reset_tether()
-	if(!attached_to)
+	if(!connected_phone)
 		return
-	if(loc == attached_to)
-		SEND_SIGNAL(attached_to, COMSIG_TRANSMITTER_NEED_DELETE_TETHER)
+	if(loc == connected_phone)
+		SEND_SIGNAL(connected_phone, COMSIG_TRANSMITTER_NEED_DELETE_TETHER)
 		return
-	if(attached_to.snapped)
-		SEND_SIGNAL(attached_to, COMSIG_TRANSMITTER_NEED_DELETE_TETHER)
+	if(connected_phone.snapped)
+		SEND_SIGNAL(connected_phone, COMSIG_TRANSMITTER_NEED_DELETE_TETHER)
 		return
 	create_tether()
 
 /obj/item/tube_phone/proc/create_tether()
 	var/atom/tether_to = src
-	var/atom/tether_from = attached_to
+	var/atom/tether_from = connected_phone
 
 	if(loc != get_turf(src))
 		tether_to = loc
 		if(tether_to.loc != get_turf(src))
-			attached_to.recall_phone()
+			connected_phone.recall_phone()
 			return
 
 	if(tether_from == tether_to)
 		return
 
-	SEND_SIGNAL(attached_to, COMSIG_TRANSMITTER_NEED_DELETE_TETHER)
+	SEND_SIGNAL(connected_phone, COMSIG_TRANSMITTER_NEED_DELETE_TETHER)
 	tether_from.AddComponent( \
 		/datum/component/transmitter_tether, \
 		tether_to, \
-		attached_to.range, \
+		connected_phone.range, \
 		tether_name = "cable", \
 		icon = "wire", \
 		icon_file = 'tff_modular/modules/colonial_marines/telephone/icons/phone.dmi', \
