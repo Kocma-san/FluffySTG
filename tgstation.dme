@@ -9064,6 +9064,7 @@
 #include "tff_modular\modules\colonial_marines\telephone\phone.dm"
 #include "tff_modular\modules\colonial_marines\telephone\phone_looping_sounds.dm"
 #include "tff_modular\modules\colonial_marines\telephone\misc\tether.dm"
+#include "tff_modular\modules\colonial_marines\telephone\misc\tetherv2.dm"
 #include "tff_modular\modules\cqd_holsters\code\holster.dm"
 #include "tff_modular\modules\cqd_holsters\code\holster_injections.dm"
 #include "tff_modular\modules\cqd_holsters\code\holster_storage.dm"

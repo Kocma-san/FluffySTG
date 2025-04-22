@@ -487,7 +487,7 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 	w_class = WEIGHT_CLASS_BULKY
 
 	var/obj/structure/transmitter/connected_phone
-
+	var/datum/transmitter_tether/cable_tether
 	var/raised = FALSE
 
 /obj/item/tube_phone/Initialize(mapload)
@@ -505,25 +505,26 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 		return
 	connected_phone = to_attach
 	ADD_TRAIT(src, TRAIT_NO_STORAGE_INSERT, "transmitter_attached")
+	qdel(cable_tether)
+	cable_tether = new(
+		connected_phone, src, \
+		connected_phone.range, \
+		tether_name = "cable", \
+		icon = "wire", icon_file = 'tff_modular/modules/colonial_marines/telephone/icons/phone.dmi', \
+		)
 
 /obj/item/tube_phone/proc/on_detach_phone()
 	connected_phone = null
 	reset_tether()	// Заменить на ремув_тетер !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	REMOVE_TRAIT(src, TRAIT_NO_STORAGE_INSERT, "transmitter_attached")
-
+	QDEL_NULL(attachment)
 
 /obj/item/tube_phone/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
 	. = ..()
+	if(loc != speaker)
+		return FALSE
 
-
-/obj/item/tube_phone/proc/handle_speak(datum/source, list/speech_args)
-	SIGNAL_HANDLER
-
-	if(!connected_phone || loc == connected_phone)
-		UnregisterSignal(usr, COMSIG_MOB_SAY)
-		return
-
-	connected_phone.handle_speak(speech_args[SPEECH_MESSAGE], speech_args[SPEECH_LANGUAGE], source)
+	connected_phone.handle_speak(message, message_language, speaker)
 
 /obj/item/tube_phone/proc/handle_hear(raw_message, datum/language/L, mob/speaking, obj/structure/transmitter/source)
 	var/spans = "purple"
@@ -578,7 +579,6 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 
 /obj/item/tube_phone/dropped(mob/user)
 	. = ..()
-	UnregisterSignal(user, COMSIG_MOB_SAY)
 	set_raised(FALSE, user)
 
 // cable prevents to place in storage) if !snapped
@@ -587,8 +587,6 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 	. = ..()
 	if(.)
 		reset_tether()
-	if(ismob(dest))
-		RegisterSignal(dest, COMSIG_MOB_SAY, PROC_REF(handle_speak))
 
 /obj/item/tube_phone/proc/reset_tether()
 	if(!connected_phone)
