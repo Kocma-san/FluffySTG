@@ -1,0 +1,737 @@
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+"aa" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "74"
+	},
+/area/shuttle/abandoned/bridge)
+"ao" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "46"
+	},
+/area/shuttle/abandoned/bridge)
+"aV" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "66"
+	},
+/area/shuttle/abandoned/bridge)
+"aZ" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "70"
+	},
+/area/shuttle/abandoned/bridge)
+"cg" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "31"
+	},
+/area/shuttle/abandoned/bridge)
+"cy" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "64"
+	},
+/area/shuttle/abandoned/bridge)
+"dL" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "78"
+	},
+/area/shuttle/abandoned/bridge)
+"eI" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "25"
+	},
+/area/shuttle/abandoned/bridge)
+"fu" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "33"
+	},
+/area/shuttle/abandoned/bridge)
+"fV" = (
+/turf/open/floor/iron/shuttle/alamo/six,
+/area/shuttle/abandoned/bridge)
+"gD" = (
+/obj/machinery/door/airlock/multi_tile/alamo/cargo,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"hQ" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "56"
+	},
+/area/shuttle/abandoned/bridge)
+"ih" = (
+/obj/structure/chair/comfy/shuttle/doublewide/right,
+/obj/structure/chair/comfy/shuttle/doublewide/left,
+/obj/machinery/vending/wallmed/directional/west,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"jR" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "96"
+	},
+/area/shuttle/abandoned/bridge)
+"kN" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "59"
+	},
+/area/shuttle/abandoned/bridge)
+"lY" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "71"
+	},
+/area/shuttle/abandoned/bridge)
+"mD" = (
+/obj/structure/chair/comfy/shuttle/doublewide/right,
+/obj/structure/chair/comfy/shuttle/doublewide/left,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"mE" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "83"
+	},
+/area/shuttle/abandoned/bridge)
+"nu" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "30"
+	},
+/area/shuttle/abandoned/bridge)
+"nY" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "20"
+	},
+/area/shuttle/abandoned/bridge)
+"oJ" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "15"
+	},
+/area/shuttle/abandoned/bridge)
+"pd" = (
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"qh" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "76"
+	},
+/area/shuttle/abandoned/bridge)
+"qi" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "92"
+	},
+/area/shuttle/abandoned/bridge)
+"rK" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "22"
+	},
+/area/shuttle/abandoned/bridge)
+"rU" = (
+/obj/docking_port/mobile{
+	dir = 2;
+	shuttle_id = "ferry";
+	name = "alamo";
+	port_direction = 8;
+	preferred_direction = 8
+	},
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"rY" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "34"
+	},
+/area/shuttle/abandoned/bridge)
+"sd" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "95"
+	},
+/area/shuttle/abandoned/bridge)
+"tz" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "75"
+	},
+/area/shuttle/abandoned/bridge)
+"ua" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "28"
+	},
+/area/shuttle/abandoned/bridge)
+"up" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "86"
+	},
+/area/shuttle/abandoned/bridge)
+"uq" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "82"
+	},
+/area/shuttle/abandoned/bridge)
+"ut" = (
+/turf/open/floor/iron/shuttle/alamo/four,
+/area/shuttle/abandoned/bridge)
+"uz" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "77"
+	},
+/area/shuttle/abandoned/bridge)
+"uE" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "2"
+	},
+/area/shuttle/abandoned/bridge)
+"vv" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "19"
+	},
+/area/shuttle/abandoned/bridge)
+"vy" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "5"
+	},
+/area/shuttle/abandoned/bridge)
+"vE" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "35"
+	},
+/area/shuttle/abandoned/bridge)
+"wi" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "63"
+	},
+/area/shuttle/abandoned/bridge)
+"wE" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "69"
+	},
+/area/shuttle/abandoned/bridge)
+"wO" = (
+/turf/open/floor/iron/shuttle/alamo/three,
+/area/shuttle/abandoned/bridge)
+"xl" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "32"
+	},
+/area/shuttle/abandoned/bridge)
+"xp" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "89"
+	},
+/area/shuttle/abandoned/bridge)
+"xM" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "14"
+	},
+/area/shuttle/abandoned/bridge)
+"yq" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "94"
+	},
+/area/shuttle/abandoned/bridge)
+"zc" = (
+/obj/machinery/computer/camera_advanced/shuttle_docker/whiteship,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"zl" = (
+/obj/machinery/computer/shuttle/white_ship,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"zm" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "53"
+	},
+/area/shuttle/abandoned/bridge)
+"zB" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "38"
+	},
+/area/shuttle/abandoned/bridge)
+"BD" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "51"
+	},
+/area/shuttle/abandoned/bridge)
+"Cg" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "65"
+	},
+/area/shuttle/abandoned/bridge)
+"Di" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "24"
+	},
+/area/shuttle/abandoned/bridge)
+"Ei" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "9"
+	},
+/area/shuttle/abandoned/bridge)
+"ET" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "8"
+	},
+/area/shuttle/abandoned/bridge)
+"FG" = (
+/turf/open/space/basic,
+/area/template_noop)
+"FO" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "27"
+	},
+/area/shuttle/abandoned/bridge)
+"Ga" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "97"
+	},
+/area/shuttle/abandoned/bridge)
+"GG" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "17"
+	},
+/area/shuttle/abandoned/bridge)
+"HL" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "18"
+	},
+/area/shuttle/abandoned/bridge)
+"HQ" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "67"
+	},
+/area/shuttle/abandoned/bridge)
+"Iq" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "47"
+	},
+/area/shuttle/abandoned/bridge)
+"II" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "52"
+	},
+/area/shuttle/abandoned/bridge)
+"JJ" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo,
+/area/shuttle/abandoned/bridge)
+"JP" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "54"
+	},
+/area/shuttle/abandoned/bridge)
+"Ke" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "36"
+	},
+/area/shuttle/abandoned/bridge)
+"Lh" = (
+/obj/structure/chair/comfy/shuttle/doublewide/right,
+/obj/structure/chair/comfy/shuttle/doublewide/left,
+/obj/machinery/light/no_nightlight/directional/east,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"LM" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "39"
+	},
+/area/shuttle/abandoned/bridge)
+"Mp" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "29"
+	},
+/area/shuttle/abandoned/bridge)
+"Nv" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "16"
+	},
+/area/shuttle/abandoned/bridge)
+"NB" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "6"
+	},
+/area/shuttle/abandoned/bridge)
+"NG" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "61"
+	},
+/area/shuttle/abandoned/bridge)
+"NL" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "49"
+	},
+/area/shuttle/abandoned/bridge)
+"NU" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "37"
+	},
+/area/shuttle/abandoned/bridge)
+"OQ" = (
+/obj/structure/chair/comfy/shuttle/doublewide/left,
+/obj/structure/chair/comfy/shuttle/doublewide/right,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"OU" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "10"
+	},
+/area/shuttle/abandoned/bridge)
+"Pp" = (
+/turf/open/floor/iron/shuttle/alamo/five,
+/area/shuttle/abandoned/bridge)
+"PK" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "80"
+	},
+/area/shuttle/abandoned/bridge)
+"Qi" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "68"
+	},
+/area/shuttle/abandoned/bridge)
+"QX" = (
+/obj/machinery/light/no_nightlight/directional/south,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"RT" = (
+/obj/structure/chair/comfy/shuttle/doublewide/right,
+/obj/structure/chair/comfy/shuttle/doublewide/left,
+/obj/machinery/light/no_nightlight/directional/west,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"St" = (
+/turf/open/floor/iron/shuttle/alamo/seven,
+/area/shuttle/abandoned/bridge)
+"Sy" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "81"
+	},
+/area/shuttle/abandoned/bridge)
+"SR" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "21"
+	},
+/area/shuttle/abandoned/bridge)
+"TB" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/window/alamo{
+	icon_state = "98"
+	},
+/area/shuttle/abandoned/bridge)
+"TE" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "62"
+	},
+/area/shuttle/abandoned/bridge)
+"TP" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "3"
+	},
+/area/shuttle/abandoned/bridge)
+"TU" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "4"
+	},
+/area/shuttle/abandoned/bridge)
+"Ud" = (
+/obj/structure/chair/comfy/shuttle/doublewide/right,
+/obj/structure/chair/comfy/shuttle/doublewide/left,
+/obj/machinery/vending/wallmed/directional/east,
+/turf/open/floor/iron/shuttle/alamo/dark/alt,
+/area/shuttle/abandoned/bridge)
+"Uk" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "26"
+	},
+/area/shuttle/abandoned/bridge)
+"UH" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "99"
+	},
+/area/shuttle/abandoned/bridge)
+"Ve" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "73"
+	},
+/area/shuttle/abandoned/bridge)
+"Vz" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "50"
+	},
+/area/shuttle/abandoned/bridge)
+"VL" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "43"
+	},
+/area/shuttle/abandoned/bridge)
+"Wd" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "48"
+	},
+/area/shuttle/abandoned/bridge)
+"Ym" = (
+/turf/open/floor/iron/shuttle/alamo/two,
+/area/shuttle/abandoned/bridge)
+"Zd" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "7"
+	},
+/area/shuttle/abandoned/bridge)
+"Ze" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "42"
+	},
+/area/shuttle/abandoned/bridge)
+"Zt" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "72"
+	},
+/area/shuttle/abandoned/bridge)
+"ZM" = (
+/turf/closed/wall/mineral/titanium/shuttle_wall/alamo{
+	icon_state = "23"
+	},
+/area/shuttle/abandoned/bridge)
+
+(1,1,1) = {"
+FG
+FG
+FG
+FG
+FG
+lY
+aV
+NG
+FG
+FG
+FG
+FG
+FG
+FG
+rY
+ua
+rK
+Nv
+FG
+FG
+FG
+"}
+(2,1,1) = {"
+FG
+FG
+FG
+FG
+tz
+Zt
+HQ
+TE
+pd
+pd
+II
+Vz
+ao
+FG
+vE
+Mp
+ZM
+GG
+FG
+FG
+JJ
+"}
+(3,1,1) = {"
+FG
+FG
+FG
+FG
+qh
+OQ
+RT
+mD
+pd
+pd
+mD
+RT
+Iq
+Ze
+Ke
+nu
+Di
+HL
+Ei
+FG
+uE
+"}
+(4,1,1) = {"
+FG
+sd
+qi
+up
+uz
+fV
+Ym
+Ym
+Ym
+Ym
+Ym
+St
+mD
+ih
+mD
+mD
+RT
+mD
+OU
+Zd
+TP
+"}
+(5,1,1) = {"
+FG
+jR
+zc
+QX
+dL
+wO
+mD
+mD
+mD
+mD
+mD
+wO
+Ym
+Ym
+Ym
+Ym
+Ym
+Ym
+gD
+FG
+FG
+"}
+(6,1,1) = {"
+pd
+Ga
+zl
+pd
+pd
+wO
+Qi
+wi
+kN
+hQ
+zm
+wO
+pd
+pd
+pd
+pd
+pd
+pd
+pd
+FG
+FG
+"}
+(7,1,1) = {"
+FG
+TB
+pd
+pd
+PK
+wO
+mD
+mD
+mD
+mD
+mD
+wO
+Ym
+Ym
+Ym
+Ym
+Ym
+Ym
+pd
+FG
+FG
+"}
+(8,1,1) = {"
+FG
+UH
+yq
+xp
+Sy
+Pp
+Ym
+Ym
+Ym
+Ym
+Ym
+ut
+mD
+Ud
+mD
+mD
+Lh
+mD
+xM
+ET
+TU
+"}
+(9,1,1) = {"
+FG
+FG
+FG
+FG
+uq
+mD
+Lh
+mD
+pd
+pd
+mD
+Lh
+Wd
+VL
+NU
+cg
+eI
+vv
+oJ
+FG
+vy
+"}
+(10,1,1) = {"
+FG
+FG
+FG
+FG
+mE
+Ve
+wE
+cy
+pd
+rU
+JP
+BD
+NL
+FG
+zB
+xl
+Uk
+nY
+FG
+FG
+NB
+"}
+(11,1,1) = {"
+FG
+FG
+FG
+FG
+FG
+aa
+aZ
+Cg
+FG
+FG
+FG
+FG
+FG
+FG
+LM
+fu
+FO
+SR
+FG
+FG
+FG
+"}
