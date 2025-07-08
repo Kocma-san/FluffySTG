@@ -50,6 +50,7 @@
 	description = "When you are on the opposing side of a revolutionary movement."
 	prereq_ids = list(TECHWEB_NODE_SEC_EQUIP)
 	design_ids = list(
+		"pin_electronic",
 		"clown_firing_pin",
 		"pin_testing",
 		"pin_loyalty",
