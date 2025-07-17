@@ -1,7 +1,6 @@
 SUBSYSTEM_DEF(economy)
 	name = "Economy"
 	wait = 5 MINUTES
-	init_order = INIT_ORDER_ECONOMY
 	runlevels = RUNLEVEL_GAME
 	///How many paychecks should players start out the round with?
 	var/roundstart_paychecks = 5
@@ -17,6 +16,7 @@ SUBSYSTEM_DEF(economy)
 										ACCOUNT_CMD = ACCOUNT_CMD_NAME,
 										ACCOUNT_DS2 = ACCOUNT_DS2_NAME,
 										ACCOUNT_INT = ACCOUNT_INT_NAME,
+										ACCOUNT_TI = ACCOUNT_TI_NAME,
 										// NOVA EDIT ADDITION END
 										ACCOUNT_SEC = ACCOUNT_SEC_NAME)
 	var/list/departmental_accounts = list()
@@ -193,7 +193,7 @@ SUBSYSTEM_DEF(economy)
 			update_alerts = TRUE
 			inflict_moneybags(moneybags)
 	earning_report += "That's all from the <i>Nanotrasen Economist Division</i>."
-	GLOB.news_network.submit_article(earning_report, "Station Earnings Report", "Station Announcements", null, update_alert = update_alerts)
+	GLOB.news_network.submit_article(earning_report, "Station Earnings Report", NEWSCASTER_STATION_ANNOUNCEMENTS, null, update_alert = update_alerts)
 	return TRUE
 
 /**

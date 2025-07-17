@@ -146,13 +146,13 @@
 /obj/effect/mob_spawn/ghost_role/Initialize(mapload)
 	. = ..()
 	SSpoints_of_interest.make_point_of_interest(src)
-	LAZYADD(GLOB.mob_spawners[name], src)
+	LAZYADD(GLOB.mob_spawners[format_text(name)], src)
 
 /obj/effect/mob_spawn/ghost_role/Destroy()
-	var/list/spawners = GLOB.mob_spawners[name]
+	var/list/spawners = GLOB.mob_spawners[format_text(name)]
 	LAZYREMOVE(spawners, src)
 	if(!LAZYLEN(spawners))
-		GLOB.mob_spawners -= name
+		GLOB.mob_spawners -= format_text(name)
 	return ..()
 
 //ATTACK GHOST IGNORING PARENT RETURN VALUE
@@ -224,7 +224,7 @@
  * If you are manually forcing a player into this mob spawn,
  * you should be using this and not directly calling [proc/create].
  */
-/obj/effect/mob_spawn/ghost_role/proc/create_from_ghost(mob/dead/user)
+/obj/effect/mob_spawn/ghost_role/proc/create_from_ghost(mob/dead/user, use_loadout = FALSE) // NOVA EDIT CHANGE - ORIGINAL: /obj/effect/mob_spawn/ghost_role/proc/create_from_ghost(mob/dead/user)
 	ASSERT(istype(user))
 	var/user_ckey = user.ckey // We need to do it before everything else, because after the create() the ckey will already have been transferred.
 
@@ -233,7 +233,7 @@
 	if(!temp_body)
 		user.mind = null // dissassociate mind, don't let it follow us to the next life
 
-	var/created = create(user)
+	var/created = create(user, /* newname */, use_loadout) // NOVA EDIT CHANGE - ORIGINAL: var/created = create(user)
 	LAZYREMOVE(ckeys_trying_to_spawn, user_ckey) // We do this AFTER the create() so that we're basically sure that the user won't be in their ghost body anymore, so they can't click on the spawner again.
 
 	if(!created)
@@ -368,3 +368,16 @@
 //don't use this in subtypes, just add 1000 brute yourself. that being said, this is a type that has 1000 brute. it doesn't really have a home anywhere else, it just needs to exist
 /obj/effect/mob_spawn/corpse/human/damaged
 	brute_damage = 1000
+
+/obj/effect/mob_spawn/cockroach
+	name = "Cockroach Spawner"
+	desc = "A spawner for cockroaches, the most common vermin in the station. Small chance to spawn a bloodroach."
+	mob_type = /mob/living/basic/cockroach
+	var/bloodroach_chance = 1 // 1% chance to spawn a bloodroach
+
+/obj/effect/mob_spawn/cockroach/Initialize(mapload)
+	if(prob(bloodroach_chance))
+		mob_type = /mob/living/basic/cockroach/bloodroach
+	. = ..()
+	INVOKE_ASYNC(src, PROC_REF(create))
+	qdel(src)

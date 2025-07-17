@@ -412,11 +412,7 @@
 	. = ..()
 	ui_interact(user)
 
-/obj/item/paper/paperslip/corporate/fluff/delam_procedure/attackby(obj/item/attacking_item, mob/living/user, params)
-	if(burn_paper_product_attackby_check(attacking_item, user))
-		SStgui.close_uis(src)
-		return
-
+/obj/item/paper/paperslip/corporate/fluff/delam_procedure/attackby(obj/item/attacking_item, mob/user, list/modifiers, list/attack_modifiers)
 	// Enable picking paper up by clicking on it with the clipboard or folder
 	if(istype(attacking_item, /obj/item/clipboard) || istype(attacking_item, /obj/item/folder) || istype(attacking_item, /obj/item/paper_bin))
 		attacking_item.attackby(src, user)

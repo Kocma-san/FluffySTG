@@ -206,30 +206,6 @@
 	strip_delay = 70
 	resistance_flags = FLAMMABLE
 	dog_fashion = null
-	//NOVA EDIT ADDITION START
-	uses_advanced_reskins = TRUE
-	unique_reskin = list(
-		"Basic Warden Armor" = list(
-			RESKIN_ICON = 'icons/obj/clothing/suits/armor.dmi',
-			RESKIN_ICON_STATE = "warden_alt",
-			RESKIN_WORN_ICON = 'icons/mob/clothing/suits/armor.dmi',
-			RESKIN_WORN_ICON_STATE = "warden_alt"
-		),
-		"Standard" = list(
-			RESKIN_ICON = 'modular_nova/master_files/icons/obj/clothing/suits/armor.dmi',
-			RESKIN_ICON_STATE = "vest_warden",
-			RESKIN_WORN_ICON = 'modular_nova/master_files/icons/mob/clothing/suits/armor.dmi',
-			RESKIN_WORN_ICON_STATE = "vest_warden",
-		),
-		"Peacekeeper" = list(
-			RESKIN_ICON = 'modular_nova/master_files/icons/obj/clothing/suits/armor.dmi',
-			RESKIN_ICON_STATE = "peacekeeper_trench_warden",
-			RESKIN_WORN_ICON = 'modular_nova/master_files/icons/mob/clothing/suits/armor.dmi',
-			RESKIN_WORN_ICON_STATE = "peacekeeper_trench_warden",
-			RESKIN_SUPPORTS_VARIATIONS_FLAGS = NONE
-		)
-	)
-	//NOVA EDIT ADDITION END
 
 /obj/item/clothing/suit/armor/vest/warden/alt
 	name = "warden's armored jacket"
@@ -884,3 +860,13 @@
 	fire = 20
 	acid = 40
 	wound = 10
+
+/obj/item/clothing/suit/armor/dragoon
+	name = "drachen suit"
+	desc = "A chainmail suit with dragon scales attached to the skeleton, with ash-covered mythril plate reinforcement covering it."
+	icon_state = "dragoon"
+	inhand_icon_state = "dragoon"
+	body_parts_covered = CHEST|GROIN|LEGS|FEET|ARMS|HANDS
+	heat_protection = CHEST|GROIN|LEGS|FEET|ARMS|HANDS
+	resistance_flags = FIRE_PROOF | ACID_PROOF
+	allowed = list(/obj/item/spear/skybulge)

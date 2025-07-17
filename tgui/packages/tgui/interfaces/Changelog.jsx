@@ -119,7 +119,7 @@ export class Changelog extends Component {
     const { dateChoices } = this;
 
     const dateDropdown = dateChoices.length > 0 && (
-      <Stack mb={1}>
+      <Stack>
         <Stack.Item>
           <Button
             className="Changelog__Button"
@@ -186,13 +186,14 @@ export class Changelog extends Component {
 
     const header = (
       <Section>
-        <h1>Nova Sector</h1>
+        <h1>Fluffy Frontier</h1>
         <p>
           <b>Thanks to: </b>
-          Traditional Games 13, Skyrat Station 13, Baystation 12, /vg/station,
-          NTstation, CDK Station devs, FacepunchStation, GoonStation devs, the
-          original Space Station 13 developers, Invisty for the title image and
-          the countless others who have contributed to the game.
+          Traditional Games 13, Skyrat Station 13, Nova Sector, Baystation 12,
+          /vg/station, NTstation, CDK Station devs, FacepunchStation,
+          GoonStation devs, the original Space Station 13 developers, Invisty
+          for the title image and the countless others who have contributed to
+          the game.
         </p>
         <p>
           {'Current project maintainers can be found '}

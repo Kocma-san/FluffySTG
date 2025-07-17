@@ -17,6 +17,7 @@
 	backpack_contents = list(
 		/obj/item/storage/box/survival/syndie,
 		/obj/item/storage/box/syndicate/contract_kit/midround,
+		/obj/item/storage/box/syndicate/contractor_loadout/stealth_contractor,
 		/obj/item/knife/combat/survival,
 		/obj/item/pinpointer/crew/contractor,
 	)
@@ -26,6 +27,10 @@
 	)
 
 	id_trim = /datum/id_trim/chameleon/contractor
+
+/datum/outfit/contractor/pre_equip(mob/living/carbon/human/user)
+	if(user.jumpsuit_style == PREF_SKIRT)
+		uniform = /obj/item/clothing/under/syndicate/nova/tactical/skirt
 
 /datum/outfit/contractor/post_equip(mob/living/carbon/human/user, visualsOnly)
 	. = ..()

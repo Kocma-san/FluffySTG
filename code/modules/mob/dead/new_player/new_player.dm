@@ -23,7 +23,7 @@
 /mob/dead/new_player/Initialize(mapload)
 	if(client && SSticker.state == GAME_STATE_STARTUP)
 		var/atom/movable/screen/splash/fade_out = new(null, null, client, TRUE)
-		fade_out.Fade(TRUE)
+		fade_out.fade(TRUE)
 
 	if(length(GLOB.newplayer_start))
 		forceMove(pick(GLOB.newplayer_start))
@@ -294,12 +294,12 @@
 
 	// NOVA EDIT ADDITION START
 	if(humanc)
-		var/list/loadout = loadout_list_to_datums(humanc.client?.prefs?.read_preference(/datum/preference/loadout))
+		var/list/loadout = humanc.client?.get_loadout_datums()
 		for(var/datum/loadout_item/item as anything in loadout)
 			if (item.restricted_roles && length(item.restricted_roles) && !(job.title in item.restricted_roles))
 				continue
 			item.post_equip_item(humanc.client?.prefs, humanc)
-	// NOVA EDIT END
+	// NOVA EDIT ADDITION END
 
 /mob/dead/new_player/proc/AddEmploymentContract(mob/living/carbon/human/employee)
 	//TODO:  figure out a way to exclude wizards/nukeops/demons from this.
@@ -348,10 +348,6 @@
 /mob/dead/new_player/proc/ViewManifest()
 	if(!client)
 		return
-	if(world.time < client.crew_manifest_delay)
-		return
-	client.crew_manifest_delay = world.time + (1 SECONDS)
-
 	GLOB.manifest.ui_interact(src)
 
 /mob/dead/new_player/Move()
