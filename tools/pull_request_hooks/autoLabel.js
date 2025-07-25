@@ -189,6 +189,6 @@ export async function get_updated_label_set({ github, context }) {
     updated_labels.delete("Merge Conflict");
   }
 
-  // return the labels to the action, which will apply it
+  // return the labels to the action, which will apply itq
   return [...updated_labels];
 }
