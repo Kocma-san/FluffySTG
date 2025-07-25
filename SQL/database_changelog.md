@@ -18,7 +18,12 @@ In any query remember to add a prefix to the table names if you use one.
 
 ---
 
-## BLEP
+Version 5.30, 3 May 2025, by Atlanta-Ned
+Adds a `manifest` table.
+
+```sql
+INSERT INTO `SS13_schemafdswision` (`major`, `minor`) VALUES (5, 33);
+```
 
 ---
 
