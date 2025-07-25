@@ -1,4 +1,4 @@
-name: Label and GBP weh
+name: Label and GBP bnlep
 on:
   pull_request_target:
     types: [closed, opened, synchronize]
