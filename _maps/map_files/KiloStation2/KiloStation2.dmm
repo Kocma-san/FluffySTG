@@ -5,7 +5,7 @@
 "aac" = (
 /obj/machinery/power/smes{
 	charge = 5e+006;
-	name = "weh ai power storage unit"
+	name = "qweai power storage unit"
 	},
 /obj/structure/cable,
 /turf/open/floor/circuit/green,
