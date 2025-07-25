@@ -72,12 +72,11 @@ function check_diff_line_for_element(diff, element) {
   const tag_re = new RegExp(`^diff --git a/${element}/`);
   const test_re = new RegExp(`diff --git a/${element}/`);
   if (tag_re.test(diff)) {
-    updated_labels.add("Original reg found: " + element);
+    console.log("Original reg found: " + element);
   }
   if (test_re.test(diff)) {
-    updated_labels.add("Updated reg found: " + element);
-  }  
-  return tag_re.test(diff);
+    console.log("Updated reg found: " + element);
+  }
 }
 
 // Checks the file diff for labels to add or remove
