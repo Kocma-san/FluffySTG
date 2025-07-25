@@ -77,6 +77,7 @@ function check_diff_line_for_element(diff, element) {
   if (test_re.test(diff)) {
     console.log("Updated reg found: " + element);
   }
+  return test_re.test(diff);
 }
 
 // Checks the file diff for labels to add or remove
