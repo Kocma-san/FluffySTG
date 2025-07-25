@@ -14,7 +14,7 @@ function keyword_to_cl_label() {
 function check_body_for_labels(body) {
   const labels_to_add = [];
 
-  // if the body contains a github "fixes #1234й" line, add the Fix tag
+  // if the body contains a github "fixes #1234" line, add the Fix tag
   const fix_regex = new RegExp(`(fix[des]*|resolve[sd]*)\s*#\d+`, "gmi");
   if (fix_regex.test(body)) {
     labels_to_add.push("Fix");
@@ -72,16 +72,15 @@ function check_diff_line_for_element(diff, element) {
   const tag_re = new RegExp(`^diff --git a/${element}/`);
   const test_re = new RegExp(`diff --git a/${element}/`);
   if (tag_re.test(diff)) {
-    updated_labels.add("Original reg found: " + element);
+    console.log("Original reg found: " + element);
   }
   if (test_re.test(diff)) {
-    updated_labels.add("Updated reg found: " + element);
-  }  
-  return tag_re.test(diff);
+    console.log("Updated reg found: " + element);
+  }
 }
 
 // Checks the file diff for labels to add or remove
-async function check_diff_for_labels(diff_url, updated_labels) {
+async function check_diff_for_labels(diff_url) {
   const labels_to_add = [];
   const labels_to_remove = [];
   try {
@@ -92,7 +91,7 @@ async function check_diff_for_labels(diff_url, updated_labels) {
         let found = false;
         const { filepaths, add_only } = autoLabelConfig.file_labels[label];
         for (let filepath of filepaths) {
-          if (check_diff_line_for_element(diff_txt, filepath, updated_labels)) {
+          if (check_diff_line_for_element(diff_txt, filepath)) {
             found = true;
             break;
           }
@@ -129,11 +128,7 @@ export async function get_updated_label_set({ github, context }) {
 
   // diff is always checked
   if (diff_url) {
-    const diff_tags = await check_diff_for_labels(diff_url, updated_labels);
-    console.log("____");
-    console.log(diff_url);
-    console.log(diff_tags);
-    console.log("____");
+    const diff_tags = await check_diff_for_labels(diff_url);
     for (let label of diff_tags.labels_to_add) {
       updated_labels.add(label);
     }
