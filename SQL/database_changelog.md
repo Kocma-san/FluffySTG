@@ -18,6 +18,15 @@ In any query remember to add a prefix to the table names if you use one.
 
 ---
 
+Version 5.31, 3 May 2025, by Atlanta-Ned
+Adds a `manifest` table.
+
+```sql
+
+```
+
+---
+
 Version 5.30, 3 May 2025, by Atlanta-Ned
 Adds a `manifest` table.
 
