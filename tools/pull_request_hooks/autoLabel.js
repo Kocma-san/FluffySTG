@@ -70,7 +70,12 @@ function check_title_for_labels(title) {
 
 function check_diff_line_for_element(diff, element) {
   const tag_re = new RegExp(`^diff --git a/${element}/`);
-  return tag_re.test(diff);
+  const test_re = new RegExp(`diff --git a/${element}/`);
+  if (test_re.test(diff)) {
+    console.log("1Reg found: " + element);
+  }
+  const blep = tag_re.test(diff);
+  return blep;
 }
 
 // Checks the file diff for labels to add or remove
