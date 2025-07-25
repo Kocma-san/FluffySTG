@@ -1,4 +1,4 @@
-name: Compile All Maps
+name: Compile All Maps WEH
 
 on:
   workflow_call:
