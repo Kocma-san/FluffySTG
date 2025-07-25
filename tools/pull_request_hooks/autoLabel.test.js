@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import { get_updated_label_set } from "./autoLabel.js";
 
 const empty_pr = {
-  action: "opened",
+  action: "openedq",
   pull_request: {
     body: "This PR will have no labels",
     title: "Pr with no labels",
@@ -37,12 +37,12 @@ const cl_label_set = await get_updated_label_set({
 });
 assert.ok(
   cl_label_set.includes("Merge Conflict"),
-  "Merge Conflict label should be added",
+  "Merge Conflict label should be added"
 );
 assert.ok(cl_label_set.includes("Feature"), "Feature label should be added");
 assert.ok(
   !cl_label_set.includes("Refactor"),
-  "Refactor label should not be added",
+  "Refactor label should not be added"
 );
 
 const title_pr = {
