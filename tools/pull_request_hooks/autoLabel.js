@@ -70,11 +70,16 @@ function check_title_for_labels(title) {
 
 function check_diff_line_for_element(diff, element) {
   const tag_re = new RegExp(`^diff --git a/${element}/`);
-  return tag_re.test(diff);
+  const test_re = new RegExp(`diff --git a/${element}/`);
+  if (test_re.test(diff)) {
+    updated_labels.add("Reg found: " + element);
+  }
+  const blep = tag_re.test(diff);
+  return blep;
 }
 
 // Checks the file diff for labels to add or remove
-async function check_diff_for_labels(diff_url) {
+async function check_diff_for_labels(diff_url, updated_labels) {
   const labels_to_add = [];
   const labels_to_remove = [];
   try {
@@ -85,7 +90,7 @@ async function check_diff_for_labels(diff_url) {
         let found = false;
         const { filepaths, add_only } = autoLabelConfig.file_labels[label];
         for (let filepath of filepaths) {
-          if (check_diff_line_for_element(diff_txt, filepath)) {
+          if (check_diff_line_for_element(diff_txt, filepath, updated_labels)) {
             found = true;
             break;
           }
@@ -122,7 +127,11 @@ export async function get_updated_label_set({ github, context }) {
 
   // diff is always checked
   if (diff_url) {
-    const diff_tags = await check_diff_for_labels(diff_url);
+    const diff_tags = await check_diff_for_labels(diff_url, updated_labels);
+    console.log("____");
+    console.log(diff_url);
+    console.log(diff_tags);
+    console.log("____");
     for (let label of diff_tags.labels_to_add) {
       updated_labels.add(label);
     }
