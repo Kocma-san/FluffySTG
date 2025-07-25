@@ -1,4 +1,4 @@
-name: Label and GBP
+name: Label and GBP main
 on:
   pull_request_target:
     types: [closed, opened, synchronize]
