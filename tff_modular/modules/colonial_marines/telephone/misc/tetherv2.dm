@@ -31,7 +31,7 @@
 	src.tether_name = tether_name
 	src.can_be_blocked = can_be_blocked
 
-/datum/transmitter_tether/RegisterWithParent()
+/datum/transmitter_tether/proc/RegisterWithParent()
 	RegisterSignal(tether_parent, COMSIG_MOVABLE_PRE_MOVE, PROC_REF(check_tether))
 	RegisterSignal(tether_parent, COMSIG_MOVABLE_MOVED, PROC_REF(check_snap))
 	RegisterSignal(tether_parent, COMSIG_QDELETING, PROC_REF(on_delete))

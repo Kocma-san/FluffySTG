@@ -6,6 +6,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 
 /obj/structure/transmitter
 	name = "telephone receiver"
+	// Добавить вставку карточек. При вставленной карточке имя позвонившего отображается у того, кому позвонили ,Если нет - на его месте кучка вопросиков
 	desc = "It is a wall mounted telephone. The fine text reads: To log your details with the mainframe please insert your keycard into the slot below. Unfortunately the slot is jammed. You can still use the phone, however."
 	icon = 'tff_modular/modules/colonial_marines/telephone/icons/phone.dmi'
 	icon_state = "wall_phone"
@@ -42,7 +43,7 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 
 	var/datum/looping_sound/telephone/busy/busy_loop
 	var/datum/looping_sound/telephone/hangup/hangup_loop
-	var/datum/looping_sound/telephone/ring/outring_loop
+	var/datum/looping_sound/telephone/dial/outring_loop
 
 	var/snapped = FALSE
 
@@ -447,28 +448,6 @@ GLOBAL_LIST_EMPTY_TYPED(phone_transmitters, /obj/structure/transmitter)
 /obj/structure/transmitter/GetVoice()
 	return "[phone_name]"
 
-/obj/structure/transmitter/proc/get_sound_file(group_name)
-	var/sound_file
-	switch(group_name)
-		if("rtb_handset")
-			sound_file = pick(
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_1.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_2.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_3.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_4.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_5.ogg',
-			)
-		if("talk_phone")
-			sound_file = pick(
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone1.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone2.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone3.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone4.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone5.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone6.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone7.ogg',
-			)
-	return sound_file
 
 MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 
@@ -517,7 +496,7 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 	connected_phone = null
 	reset_tether()	// Заменить на ремув_тетер !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	REMOVE_TRAIT(src, TRAIT_NO_STORAGE_INSERT, "transmitter_attached")
-	QDEL_NULL(attachment)
+	// QDEL_NULL(attachment)
 
 /obj/item/tube_phone/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
 	. = ..()

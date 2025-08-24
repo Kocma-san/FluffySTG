@@ -38,4 +38,4 @@ IN `tff_modular/modules/colonial_marines/telephone/_phone_defines.dm`:
 
 ### Credits
 
-- Colonial Marines and their coders for sprites, sounds, code and inspiration
+- Colonial Marines and their developers for sprites, sounds, code and inspiration
