@@ -14,6 +14,11 @@
 	used_names[text] = TRUE
 	return text
 
+/proc/get_phone_by_id(id)
+	for(var/obj/machinery/stationary_phone/phone in SSmachines.get_machines_by_type_and_subtypes(/obj/machinery/stationary_phone))
+		if(phone.phone_id == id && !QDELETED(phone))
+			return phone
+	return null
 
 /proc/get_sound_file(group_name)
 	var/sound_file

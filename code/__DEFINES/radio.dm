@@ -60,6 +60,10 @@
 #define RADIO_CHANNEL_CTF_GREEN "Green Team"
 #define RADIO_CHANNEL_CTF_YELLOW "Yellow Team"
 
+// FLUFFY FRONTIER ADDITION START
+#define TELEPHONE_CHANNEL "Telephone"
+#define FREQ_TELEPHONE 1009
+// FLUFFY FRONTIER ADDITION END
 
 #define MIN_FREE_FREQ 1201 // -------------------------------------------------
 // Frequencies are always odd numbers and range from 1201 to 1599.

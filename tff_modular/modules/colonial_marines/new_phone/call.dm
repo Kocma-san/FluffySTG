@@ -53,9 +53,11 @@
 
 /obj/machinery/stationary_phone/Destroy(force)
 	if(current_connection)
-		end_call() // +maybe Redo
+		current_connection.hangup()
 	if(is_handset_on_phone())
 		qdel(attached_handset)
+	else
+		disconnect_handset()
 	qdel(connection_problem_loop_sound)
 	qdel(hangup_loop_sound)
 	qdel(busy_loop_sound)
@@ -72,7 +74,7 @@
 
 	if(is_handset_on_phone())
 		context[SCREENTIP_CONTEXT_RMB] = "Pick up handset"
-	if(held_item == attached_handset)
+	else if(held_item == attached_handset)
 		context[SCREENTIP_CONTEXT_RMB] = "Return handset"
 
 	return CONTEXTUAL_SCREENTIP_SET
@@ -80,13 +82,11 @@
 /obj/machinery/stationary_phone/item_interaction_secondary(mob/living/user, obj/item/tool, list/modifiers)
 	. = ..()
 	if(tool == attached_handset)
-		playsound(src, get_sound_file("rtb_handset"), 100, FALSE, 7)
-		stop_hangup_sound()
-		stop_busy_sound()
-		stop_connection_problem_sound()
+		playsound(src, get_sound_file("rtb_handset"), 50, FALSE)
+		stop_all_sounds()
 		tool.forceMove(src)
 		if(current_connection)
-			end_call()
+			current_connection.hangup()
 		update_icon(UPDATE_ICON_STATE)
 		return ITEM_INTERACT_SUCCESS
 	return ITEM_INTERACT_FAILURE
@@ -99,7 +99,8 @@
 		playsound(src, get_sound_file("rtb_handset"), 100, FALSE, 7)
 		// ## +start noise
 		user.put_in_hands(attached_handset)
-		SEND_SIGNAL(src, COMSIG_PHONE_ACCEPT_CALL)
+		if(current_connection)
+			current_connection.complete_connection()
 		update_icon(UPDATE_ICON_STATE)
 		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
@@ -107,7 +108,7 @@
 	. = ..()
 	if(!is_handset_on_phone())
 		icon_state = "[base_icon_state]-ear"
-	else if(current_connection?.current_status == CONSTATUS_CALLING)
+	else if(current_connection && current_connection.dialed_phone == src)
 		icon_state = "[base_icon_state]-ring"
 	else
 		icon_state = "[base_icon_state]"
@@ -136,6 +137,8 @@
 	switch(action)
 		if("keypad")
 			playsound(src, SFX_TERMINAL_TYPE, 30, FALSE)
+			if(current_connection)
+				return TRUE
 			var/digit = params["digit"]
 			switch(digit)
 				if("C")
@@ -153,16 +156,9 @@
 						playsound(src, 'sound/machines/nuke/general_beep.ogg', 50, FALSE)
 					return TRUE
 
-
 /*
  * Работа звонка
  */
-
-/obj/machinery/stationary_phone/proc/get_phone_by_id(id)
-	for(var/obj/machinery/stationary_phone/phone in SSmachines.get_machines_by_type_and_subtypes(/obj/machinery/stationary_phone))
-		if(phone.phone_id == id)
-			return phone
-	return null
 
 /obj/machinery/stationary_phone/proc/get_current_status()
 	if(!enabled)
@@ -174,131 +170,162 @@
 	return PHONE_AVAILABLE
 
 /obj/machinery/stationary_phone/proc/try_start_call(entered_number)
-	var/obj/machinery/stationary_phone/target_phone = get_phone_by_id(entered_number)
+	if(current_connection)
+		CRASH("Телефон с активным соединением пытается позвонить!")
 
-	if(isnull(target_phone))
-		start_connection_problem_sound()
-		return FALSE
+	new /datum/phone_connection(src, entered_number)
 
-	if(target_phone.get_current_status() != PHONE_AVAILABLE)
-		start_busy_sound()
-		return FALSE
-
-	new /datum/phone_connection(src, target_phone)
-	return TRUE
-
-/obj/machinery/stationary_phone/proc/end_call()
-	current_connection.end_connection()
 
 
 /datum/phone_connection
-	// /// Список всех подключенных телефонов (Обычно 2, но в теории можно и больше)
-	// var/list/obj/machinery/stationary_phone/connected_phones = list()
-	var/obj/machinery/stationary_phone/starting_phone
-	var/obj/machinery/stationary_phone/target_phone
+	var/obj/machinery/stationary_phone/calling_phone
+	var/obj/machinery/stationary_phone/connected_phone
+	var/obj/machinery/stationary_phone/dialed_phone
 	/// Текущее состояние соединения
-	var/current_status = CONSTATUS_NO_STATUS
+	VAR_PRIVATE/current_status = CONSTATUS_NO_STATUS
 	/// Сам таймер таймаута. Нулл, если сейчас не идет вызов
 	var/timeout_timer_id
 	/// Время за которое на том конце должны взять трубку, иначе звонок сбросится
 	var/timeout_duration = 45 SECONDS
 	// ### + add history for that call
 
-/datum/phone_connection/New(obj/machinery/stationary_phone/starting_phone, obj/machinery/stationary_phone/target_phone)
-	. = ..()
-	if(!starting_phone || !target_phone)
-		CRASH("wehwehwehweh")
+/datum/phone_connection/New(obj/machinery/stationary_phone/calling, dialed_number)
+	if(isnull(calling))
+		stack_trace("No calling phone when creating phone connection!")
+		qdel(src)
+		return
+	if(isnull(dialed_number))
+		stack_trace("No number entered when starting phone connection!")
+		qdel(src)
+		return
+	if(!isnull(calling.current_connection))
+		stack_trace("Calling phone already has connection!")
+		qdel(src)
+		return
 
-	if(!isnull(starting_phone.current_connection) || !isnull(target_phone.current_connection))
-		CRASH("One of the phones already has connection. Starting: [!!starting_phone.current_connection]; Target: [!!target_phone.current_connection]")
+	calling_phone = calling
+	calling_phone.current_connection = src
 
-	src.starting_phone = starting_phone
-	src.target_phone = target_phone
-	starting_phone.current_connection = src
-	target_phone.current_connection = src
+	dialed_phone = get_phone_by_id(dialed_number)
+	if(dialed_phone == calling)
+		qdel(src)
+		return
+	if(isnull(dialed_phone))
+		calling_phone.start_connection_problem_sound()
+		qdel(src)
+		return
+	if(dialed_phone.get_current_status() != PHONE_AVAILABLE)
+		calling_phone.start_busy_sound()
+		qdel(src)
+		return
 
-	start_connection()
-
-/datum/phone_connection/Destroy(force)
-	end_connection()
-	return ..()
-
-/datum/phone_connection/proc/start_connection()
 	current_status = CONSTATUS_CALLING
+	dialed_phone.current_connection = src
+
+	calling_phone.start_dial_sound()
+	dialed_phone.start_ring_sound()
+	dialed_phone.update_icon(UPDATE_ICON_STATE)
 
 	timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(connection_timeout)), timeout_duration, TIMER_UNIQUE|TIMER_STOPPABLE)
-	RegisterSignal(target_phone, COMSIG_PHONE_ACCEPT_CALL, PROC_REF(complete_connection))
-	starting_phone.start_dial_sound()
-	target_phone.start_ring_sound()
-	target_phone.update_icon(UPDATE_ICON_STATE)
+
+/datum/phone_connection/Destroy(force)
+    dialed_phone?.current_connection = null
+    calling_phone?.current_connection = null
+    connected_phone?.current_connection = null
+    end_connection()
+    dialed_phone = null
+    calling_phone = null
+    connected_phone = null
+    return ..()
+
+/datum/phone_connection/proc/connection_timeout()
+	current_status = CONSTATUS_TIMEOUT
+	qdel(src)
+
+/datum/phone_connection/proc/hangup()
+	qdel(src)
 
 /datum/phone_connection/proc/complete_connection()
 	current_status = CONSTATUS_INITIALIZED
 
-	UnregisterSignal(target_phone, COMSIG_PHONE_ACCEPT_CALL)
 	deltimer(timeout_timer_id)
 	timeout_timer_id = null
 
-	starting_phone.stop_dial_sound()
-	target_phone.stop_ring_sound()
+	dialed_phone.stop_ring_sound()
+	calling_phone.stop_dial_sound()
 
-	RegisterSignal(starting_phone, COMSIG_PHONE_SEND_DATA, PROC_REF(transmitt_data))
-	RegisterSignal(target_phone, COMSIG_PHONE_SEND_DATA, PROC_REF(transmitt_data))
-
-/datum/phone_connection/proc/connection_timeout()
-	SIGNAL_HANDLER
-
-	end_connection()
+	connected_phone = dialed_phone
+	dialed_phone = null
 
 /datum/phone_connection/proc/end_connection()
-	starting_phone.current_connection = null
-	target_phone.current_connection = null
-
 	switch(current_status)
+		if(CONSTATUS_NO_STATUS)	// Ничего не делаем
 		if(CONSTATUS_CALLING)
-			starting_phone.stop_dial_sound()
-			starting_phone.start_busy_sound()
-			target_phone.stop_ring_sound()
-			target_phone.update_icon(UPDATE_ICON_STATE)
-			UnregisterSignal(target_phone, COMSIG_PHONE_ACCEPT_CALL)
+			calling_phone.stop_dial_sound()
+			dialed_phone.stop_ring_sound()
+			dialed_phone.update_icon(UPDATE_ICON_STATE)
+			if(connected_phone)
+				stack_trace("Phone connection has connected phone when should not. Current status: [current_status]")
+		if(CONSTATUS_TIMEOUT)
+			calling_phone.stop_dial_sound()
+			calling_phone.start_busy_sound()
+			dialed_phone.stop_ring_sound()
+			dialed_phone.update_icon(UPDATE_ICON_STATE)
+			if(connected_phone)
+				stack_trace("Phone connection has connected phone when should not. Current status: [current_status]")
 		if(CONSTATUS_INITIALIZED)
-			if(!starting_phone.is_handset_on_phone())
-				starting_phone.start_hangup_sound()
-			if(!target_phone.is_handset_on_phone())
-				target_phone.start_hangup_sound()
-			UnregisterSignal(starting_phone, COMSIG_PHONE_SEND_DATA)
-			UnregisterSignal(target_phone, COMSIG_PHONE_SEND_DATA)
+			if(!calling_phone.is_handset_on_phone())
+				calling_phone.start_hangup_sound()
+			if(!connected_phone.is_handset_on_phone())
+				connected_phone.start_hangup_sound()
+			if(dialed_phone)
+				stack_trace("Phone connection has dialled phone when should not. Current status: [current_status]")
 		else
 			CRASH("Invalid status for ending a call. Current status: [current_status]")
 
-	starting_phone = null
-	target_phone = null
-
 	current_status = CONSTATUS_ENDED
 
-/datum/phone_connection/proc/transmitt_data(list/data, obj/machinery/stationary_phone/sender)
-	SIGNAL_HANDLER
+/datum/phone_connection/proc/transmitt_data(speaker_phone, speaker, message_language, raw_message, list/spans, list/message_mods)
+	var/obj/machinery/stationary_phone/getter
+	if(speaker_phone == connected_phone)
+		getter = calling_phone
+	else
+		getter = connected_phone
 
-	var/obj/machinery/stationary_phone/getter = sender == target_phone ? starting_phone : target_phone
+	getter.recieve_message(null, speaker, message_language, raw_message, FREQ_TELEPHONE, spans, message_mods, INFINITY)
 
-	var/message = sender.say_quote(data["raw_message"], data["message_mods"])
-	var/rendered = span_big(span_purple("<b>\[Telephone\] [sender.phone_id]</b> [message]"))
+/obj/item/phone_handset/proc/play_message(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
+	playsound(src, get_sound_file("talk_phone"), 50, TRUE, SILENCED_SOUND_EXTRARANGE)
 
-	log_telecomms(rendered)
+	speaker = src
 
-	getter.attached_handset.say_message(rendered, data["message_language"])
-	send_to_observers(rendered, src)
+	var/list/hearers = get_hearers_in_LOS(speech_range, src)
+
+	for(var/atom/movable/hearer as anything in hearers)
+		if(!hearer)
+			stack_trace("null found in the hearers list returned by the spatial grid. This is bad")
+			continue
+		if(isobserver(hearer))
+			continue
+		if(istype(hearer, /obj/item/phone_handset))
+			continue
+		hearer.Hear(message, speaker, message_language, raw_message, radio_freq, spans, message_mods, message_range)
+
+	var/rendered = compose_message(speaker, message_language, raw_message, radio_freq, spans, message_mods, visible_name)
+	send_to_observers(rendered, speaker)
 
 /*
  * Отправка и получение звуков
  */
 
-/obj/machinery/stationary_phone/proc/get_data(message)
-	// attached_handset.say_message(message)
-
-/obj/machinery/stationary_phone/proc/need_to_send_data(data)
+/obj/machinery/stationary_phone/proc/send_message(speaker, message_language, raw_message, list/spans, list/message_mods)
 	SIGNAL_HANDLER
-	SEND_SIGNAL(src, COMSIG_PHONE_SEND_DATA, data, src)
+	if(current_connection)
+		current_connection.transmitt_data(src, speaker, message_language, raw_message, spans, message_mods)
+
+/obj/machinery/stationary_phone/proc/recieve_message(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
+	if(attached_handset)
+		attached_handset.play_message(message, speaker, message_language, raw_message, radio_freq, spans, message_mods, message_range)
 
 /*
  * Трубка телефона
@@ -315,22 +342,30 @@
 	// Соединенный с трубкой телефон
 	var/obj/machinery/stationary_phone/connected_phone
 	/// На каком расстоянии будет слышно слова из трубки
+	var/speech_range = 2
+	/// На каком расстоянии трубка сылшит звуки
 	var/hear_range = 1
+	/// Будет ли видно имя человека, которого вы слышите в трубке
+	var/anonymous = TRUE
+	var/visible_name = "tube"
+
+/obj/item/phone_handset/Initialize(mapload)
+	. = ..()
+	become_hearing_sensitive()
 
 /obj/item/phone_handset/Destroy(force)
 	connected_phone.disconnect_handset()
 	return ..()
 
-/obj/item/phone_handset/proc/say_message(message, language)
-	var/list/hearers = get_hearers_in_LOS(hear_range, src)
+/obj/item/phone_handset/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
+	. = ..()
+	if(get_dist(src, speaker) > hear_range)
+		return
+	if(message_mods[MODE_CUSTOM_SAY_ERASE_INPUT])	// Чисто эмоция, нет слов -> не передаем
+		return
+	if(connected_phone)
+		connected_phone.send_message(speaker, message_language, raw_message, spans, message_mods)
 
-	// ## +Звук
-
-	for(var/atom/movable/hearer as anything in hearers)
-		if(!hearer)
-			stack_trace("null found in the hearers list returned by the spatial grid. this is bad")
-			continue
-		hearer.Hear(message, message_language = language, message_range = INFINITY)
 
 
 /obj/machinery/stationary_phone/proc/is_handset_on_phone()
@@ -341,16 +376,18 @@
 	return FALSE
 
 /obj/machinery/stationary_phone/proc/connect_handset(obj/item/phone_handset/handset)
-	// if(attached_handset)
-	// 	disconnect_handset()
+	if(attached_handset)
+		stack_trace("Phone handset are connecting to a phone with existed handset!")
 	attached_handset = handset
 	attached_handset.connected_phone = src
-	RegisterSignal(attached_handset, COMSIG_MOVABLE_HEAR, PROC_REF(need_to_send_data))
 
 /obj/machinery/stationary_phone/proc/disconnect_handset()
-	UnregisterSignal(attached_handset, COMSIG_MOVABLE_HEAR)
 	attached_handset.connected_phone = null
 	attached_handset = null
+
+
+
+
 
 /*
  * Sounds
@@ -398,6 +435,13 @@
 
 /obj/machinery/stationary_phone/proc/stop_ring_sound()
 	ring_loop_sound.stop(TRUE)
+
+/obj/machinery/stationary_phone/proc/stop_all_sounds()
+	stop_connection_problem_sound()
+	stop_hangup_sound()
+	stop_busy_sound()
+	stop_dial_sound()
+	stop_ring_sound()
 
 
 #undef MAX_ENTERED_NUMBER_LENGTH

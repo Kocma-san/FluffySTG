@@ -11,6 +11,7 @@
 	mid_sounds = 'tff_modular/modules/colonial_marines/telephone/sound/phone_busy.ogg'
 	mid_length = 1 SECONDS
 	volume = 15
+	falloff_exponent = 10
 
 /datum/looping_sound/telephone/hangup
 	start_sound = 'tff_modular/modules/colonial_marines/telephone/sound/remote_hangup.ogg'
@@ -18,16 +19,18 @@
 	mid_sounds = 'tff_modular/modules/colonial_marines/telephone/sound/phone_busy.ogg'
 	mid_length = 1 SECONDS
 	volume = 15
+	falloff_exponent = 10
 
 /datum/looping_sound/telephone/connection_problem
 	start_sound = 'tff_modular/modules/colonial_marines/telephone/sound/SIT.ogg'
 	start_length = 6 SECONDS
-	start_volume = 20
+	start_volume = 30
 	mid_sounds = 'tff_modular/modules/colonial_marines/telephone/sound/reorder_tone.ogg'
 	mid_length = 1 SECONDS
-	volume = 10
+	volume = 7
 
 /datum/looping_sound/telephone/ring
 	mid_sounds = 'tff_modular/modules/colonial_marines/telephone/sound/telephone_ring.ogg'
 	mid_length = 3 SECONDS
 	volume = 15
+	falloff_exponent = 3
