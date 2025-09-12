@@ -7,9 +7,9 @@
 	if(our_armor <= 0)
 		return our_armor
 	if(weak_against_armour && our_armor >= 0)
-		our_armor *= ARMOR_WEAKENED_MULTIPLIER
+		our_armor *= 2
 	if(silent)
-		return max(0, PENETRATE_ARMOUR(our_armor, armour_penetration))
+		return max(0, (armour_penetration == 100 ? 0 : 100 * (our_armor - armour_penetration) / (100 - armour_penetration)))
 
 	//the if "armor" check is because this is used for everything on /living, including humans
 	if(armour_penetration)

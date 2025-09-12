@@ -77,10 +77,80 @@
 	var/target_path = /obj/item/ammo_box/magazine
 	var/output_file = file("tff_modular/magazine.html")
 	var/list/required_data = list(
-		"Weapon Path" = "type",
-		"Weapon Name" = "name",
+		"Path" = "type",
+		"Name" = "name",
 		"caliber" = "caliber",
 		"ammo_type" = "ammo_type",
 		"max_ammo" = "max_ammo",
 	)
 	parse_atom_subtypes(target_path, output_file, required_data)
+
+/proc/parse_casing_to_html()
+	var/target_paths = list()
+	var/output_file = file("tff_modular/ammo.html")
+	var/list/required_data = list(
+		"Path" = "type",
+		"Name" = "name",
+		"caliber" = "caliber",
+		"delay" = "delay",
+		"projectile_type" = "projectile_type",
+	)
+	var/list/additional_data = list(
+		"projectile_speed" = "speed",
+		"projectile_is_hitscan" = "hitscan",
+		"projectile_damage" = "damage",
+		"projectile_damage_type" = "damage_type",
+		"projectile_armor_flag" = "armor_flag",
+		"projectile_armour_penetration" = "armour_penetration",
+		"projectile_weak_against_armour" = "weak_against_armour",
+		"projectile_range" = "range",
+		"projectile_reflectable" = "reflectable",
+		"projectile_stun" = "stun",
+		"projectile_knockdown" = "knockdown",
+		"projectile_paralyze" = "paralyze",
+		"projectile_immobilize" = "immobilize",
+		"projectile_unconscious" = "unconscious",
+		"projectile_eyeblur" = "eyeblur",
+		"projectile_drowsy" = "drowsy",
+		"projectile_jitter" = "jitter",
+		"projectile_stamina" = "stamina",
+		"projectile_stutter" = "stutter",
+		"projectile_slur" = "slur",
+		"projectile_dismemberment" = "dismemberment",
+	)
+
+	for(var/item_subtype in subtypesof(/obj/item/ammo_casing))
+		var/item_instance = new item_subtype
+		if(!isnull(item_instance?:caliber))
+			target_paths += item_subtype
+		qdel(item_instance)
+
+	output_file << "<table border=\"1\"><thead><tr>"
+
+	for(var/data_name in required_data)
+		output_file << "<th>[data_name]</th>"
+	for(var/data_name in additional_data)
+		output_file << "<th>[data_name]</th>"
+
+	output_file << "</tr></thead>"
+	output_file << "<tbody>"
+
+	for(var/item_subtype in target_paths)
+		var/item_instance = new item_subtype
+		output_file << "<tr>"
+		for(var/data_name in required_data)
+			var/required_var = required_data[data_name]
+			output_file << "<td>[item_instance?:vars[required_var]]</td>"
+
+		var/proj_type = item_instance?:projectile_type
+		if(ispath(proj_type))
+			var/proj_instance = new proj_type
+			for(var/data_name in additional_data)
+				var/required_var = additional_data[data_name]
+				output_file << "<td>[proj_instance?:vars[required_var]]</td>"
+			qdel(proj_instance)
+
+		output_file << "</tr>"
+		qdel(item_instance)
+
+	output_file << "</tbody></table>"
