@@ -79,8 +79,13 @@
 
 	return CONTEXTUAL_SCREENTIP_SET
 
+/obj/machinery/stationary_phone/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(tool == attached_handset)
+		interact(user)
+		return ITEM_INTERACT_BLOCKING
+	return ..()
+
 /obj/machinery/stationary_phone/item_interaction_secondary(mob/living/user, obj/item/tool, list/modifiers)
-	. = ..()
 	if(tool == attached_handset)
 		playsound(src, get_sound_file("rtb_handset"), 50, FALSE)
 		stop_all_sounds()
@@ -89,7 +94,7 @@
 			current_connection.hangup()
 		update_icon(UPDATE_ICON_STATE)
 		return ITEM_INTERACT_SUCCESS
-	return ITEM_INTERACT_FAILURE
+	return ..()
 
 /obj/machinery/stationary_phone/attack_hand_secondary(mob/user, list/modifiers)
 	. = ..()
@@ -112,7 +117,6 @@
 		icon_state = "[base_icon_state]-ring"
 	else
 		icon_state = "[base_icon_state]"
-
 
 /*
  * UI
@@ -174,7 +178,6 @@
 		CRASH("Телефон с активным соединением пытается позвонить!")
 
 	new /datum/phone_connection(src, entered_number)
-
 
 
 /datum/phone_connection
@@ -257,6 +260,9 @@
 	connected_phone = dialed_phone
 	dialed_phone = null
 
+	RegisterSignal(calling_phone.attached_handset, COMSIG_MOVABLE_HEAR, PROC_REF(transmitt_data))
+	RegisterSignal(connected_phone.attached_handset, COMSIG_MOVABLE_HEAR, PROC_REF(transmitt_data))
+
 /datum/phone_connection/proc/end_connection()
 	switch(current_status)
 		if(CONSTATUS_NO_STATUS)	// Ничего не делаем
@@ -280,52 +286,27 @@
 				connected_phone.start_hangup_sound()
 			if(dialed_phone)
 				stack_trace("Phone connection has dialled phone when should not. Current status: [current_status]")
+			UnregisterSignal(calling_phone.attached_handset, COMSIG_MOVABLE_HEAR)
+			UnregisterSignal(connected_phone.attached_handset, COMSIG_MOVABLE_HEAR)
 		else
 			CRASH("Invalid status for ending a call. Current status: [current_status]")
 
 	current_status = CONSTATUS_ENDED
 
-/datum/phone_connection/proc/transmitt_data(speaker_phone, speaker, message_language, raw_message, list/spans, list/message_mods)
-	var/obj/machinery/stationary_phone/getter
-	if(speaker_phone == connected_phone)
-		getter = calling_phone
-	else
-		getter = connected_phone
-
-	getter.recieve_message(null, speaker, message_language, raw_message, FREQ_TELEPHONE, spans, message_mods, INFINITY)
-
-/obj/item/phone_handset/proc/play_message(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
-	playsound(src, get_sound_file("talk_phone"), 50, TRUE, SILENCED_SOUND_EXTRARANGE)
-
-	speaker = src
-
-	var/list/hearers = get_hearers_in_LOS(speech_range, src)
-
-	for(var/atom/movable/hearer as anything in hearers)
-		if(!hearer)
-			stack_trace("null found in the hearers list returned by the spatial grid. This is bad")
-			continue
-		if(isobserver(hearer))
-			continue
-		if(istype(hearer, /obj/item/phone_handset))
-			continue
-		hearer.Hear(message, speaker, message_language, raw_message, radio_freq, spans, message_mods, message_range)
-
-	var/rendered = compose_message(speaker, message_language, raw_message, radio_freq, spans, message_mods, visible_name)
-	send_to_observers(rendered, speaker)
-
-/*
- * Отправка и получение звуков
- */
-
-/obj/machinery/stationary_phone/proc/send_message(speaker, message_language, raw_message, list/spans, list/message_mods)
+/datum/phone_connection/proc/transmitt_data(datum/source, list/hearing_args)
 	SIGNAL_HANDLER
-	if(current_connection)
-		current_connection.transmitt_data(src, speaker, message_language, raw_message, spans, message_mods)
 
-/obj/machinery/stationary_phone/proc/recieve_message(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
-	if(attached_handset)
-		attached_handset.play_message(message, speaker, message_language, raw_message, radio_freq, spans, message_mods, message_range)
+	var/obj/item/phone_handset/getter = connected_phone.attached_handset
+	if(getter == source)
+		getter = calling_phone.attached_handset
+
+	getter.play_message(
+		hearing_args[HEARING_SPEAKER],
+		hearing_args[HEARING_LANGUAGE],
+		hearing_args[HEARING_RAW_MESSAGE],
+		hearing_args[HEARING_SPANS],
+		hearing_args[HEARING_MESSAGE_MODE],
+	)
 
 /*
  * Трубка телефона
@@ -333,9 +314,9 @@
 
 /obj/item/phone_handset
 	name = "telephone"
-	icon = 'tff_modular/modules/colonial_marines/telephone/icons/phone.dmi'
-	lefthand_file = 'tff_modular/modules/colonial_marines/telephone/icons/phone_inhand_lefthand.dmi'
-	righthand_file = 'tff_modular/modules/colonial_marines/telephone/icons/phone_inhand_righthand.dmi'
+	icon = 'tff_modular/modules/colonial_marines/new_phone/icons/phone.dmi'
+	lefthand_file = 'tff_modular/modules/colonial_marines/new_phone/icons/phone_inhand_lefthand.dmi'
+	righthand_file = 'tff_modular/modules/colonial_marines/new_phone/icons/phone_inhand_righthand.dmi'
 	icon_state = "rpb_phone"
 	inhand_icon_state = "rpb_phone"
 
@@ -345,9 +326,8 @@
 	var/speech_range = 2
 	/// На каком расстоянии трубка сылшит звуки
 	var/hear_range = 1
-	/// Будет ли видно имя человека, которого вы слышите в трубке
-	var/anonymous = TRUE
-	var/visible_name = "tube"
+	/// Может ли слышать звуки из других телефонных трубок
+	var/can_hear_other_phones = FALSE
 
 /obj/item/phone_handset/Initialize(mapload)
 	. = ..()
@@ -358,14 +338,30 @@
 	return ..()
 
 /obj/item/phone_handset/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
-	. = ..()
 	if(get_dist(src, speaker) > hear_range)
-		return
-	if(message_mods[MODE_CUSTOM_SAY_ERASE_INPUT])	// Чисто эмоция, нет слов -> не передаем
-		return
-	if(connected_phone)
-		connected_phone.send_message(speaker, message_language, raw_message, spans, message_mods)
+		return FALSE
+	if(!can_hear_other_phones && istype(speaker, /obj/item/phone_handset))
+		return FALSE
+	if(message_mods[MODE_CUSTOM_SAY_ERASE_INPUT]) // Чисто эмоция, нет слов -> не передаем
+		return FALSE
+	return ..()
 
+/obj/item/phone_handset/proc/play_message(atom/movable/speaker, message_language, raw_message, list/spans, list/message_mods)
+	playsound(src, get_sound_file("talk_phone"), 50, TRUE, SILENCED_SOUND_EXTRARANGE)
+
+	var/list/hearers = get_hearers_in_LOS(speech_range, src)
+
+	for(var/mob/dead/observer/ghost in GLOB.player_list)
+		if(get_chat_toggles(ghost.client) & CHAT_GHOSTRADIO)
+			hearers |= ghost
+
+	for(var/atom/movable/hearer as anything in hearers)
+		if(!hearer)
+			stack_trace("null found in the hearers list returned by the spatial grid. This is bad")
+			continue
+		if(hearer == src)
+			continue
+		hearer.Hear(null, src, message_language, raw_message, null, spans, message_mods, speech_range)
 
 
 /obj/machinery/stationary_phone/proc/is_handset_on_phone()

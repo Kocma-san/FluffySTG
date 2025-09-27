@@ -25,20 +25,20 @@
 	switch(group_name)
 		if("rtb_handset")
 			sound_file = pick(
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_1.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_2.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_3.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_4.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/rtb_handset_5.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/rtb_handset_1.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/rtb_handset_2.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/rtb_handset_3.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/rtb_handset_4.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/rtb_handset_5.ogg',
 			)
 		if("talk_phone")
 			sound_file = pick(
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone1.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone2.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone3.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone4.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone5.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone6.ogg',
-				'tff_modular/modules/colonial_marines/telephone/sound/talk_phone7.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone1.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone2.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone3.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone4.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone5.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone6.ogg',
+				'tff_modular/modules/colonial_marines/new_phone/sound/talk_phone7.ogg',
 			)
 	return sound_file
