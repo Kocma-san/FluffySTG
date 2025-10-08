@@ -27,7 +27,6 @@ GLOBAL_LIST_INIT(freqtospan, list(
 	"[FREQ_CTF_GREEN]" = "greenteamradio",
 	"[FREQ_CTF_YELLOW]" = "yellowteamradio",
 	"[FREQ_STATUS_DISPLAYS]" = "captaincast",
-	"[FREQ_TELEPHONE]" = "yellowteamradio", // FLUFFY FRONTIER ADDITION
 ))
 
 /**
