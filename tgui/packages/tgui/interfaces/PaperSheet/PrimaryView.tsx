@@ -56,6 +56,12 @@ export class PrimaryView extends Component {
       'inputFieldData',
       {},
     );
+    // FLUFFY START
+    const [inputMLFieldData, setInputMLFieldData] = useLocalState(
+      'inputMLFieldData',
+      {},
+    );
+    // FLUFFY END
 
     const [textAreaText, setTextAreaText] = useLocalState('textAreaText', '');
 
@@ -63,7 +69,9 @@ export class PrimaryView extends Component {
       held_item_details?.interaction_mode || InteractionType.reading;
 
     const savableData =
-      textAreaText.length || Object.keys(inputFieldData).length;
+      textAreaText.length ||
+      Object.keys(inputFieldData).length ||
+      Object.keys(inputMLFieldData).length; // FLUFFY EDIT - ORIGINAL: textAreaText.length || Object.keys(inputFieldData).length;
 
     const dmCharacters =
       raw_text_input?.reduce((lhs: number, rhs: PaperInput) => {
@@ -120,6 +128,14 @@ export class PrimaryView extends Component {
                           });
                           setInputFieldData({});
                         }
+                        // FLUFFY START
+                        if (Object.keys(inputMLFieldData).length) {
+                          act('fill_input_ml_field', {
+                            field_data: inputMLFieldData,
+                          });
+                          setInputMLFieldData({});
+                        }
+                        // FLUFFY END
                       }}
                     >
                       Save

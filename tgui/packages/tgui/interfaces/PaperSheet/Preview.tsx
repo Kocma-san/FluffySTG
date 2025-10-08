@@ -24,6 +24,7 @@ type FieldCreationReturn = {
 
 // Regex that finds [____] fields.
 const fieldRegex: RegExp = /\[((?:_+))\]/gi;
+const multilineFieldRegex: RegExp = /\{\[\]\}/gi;
 
 /**
  * Real-time text preview section. When not editing, this is simply
@@ -155,6 +156,52 @@ export class PreviewView extends Component<PreviewViewProps> {
 
     return this.props.canEdit !== nextProps.canEdit;
   }
+
+  // FLUFFY START
+  onMLFieldInputHandler = (ev: Event): void => {
+    const input = ev.target as HTMLInputElement;
+
+    // We don't care about text area input, but this is a good place to
+    // clear the text box cache if we've had new input.
+    if (input.nodeName !== 'INPUT') {
+      this.parsedTextBoxCache = '';
+      return;
+    }
+
+    const [inputMLFieldData, setInputMLFieldData] = useLocalState(
+      'inputMLFieldData',
+      {},
+    );
+
+    const { data } = useBackend<PaperContext>();
+    const { default_pen_font, default_pen_color, held_item_details } = data;
+
+    if (input.value.length) {
+      inputMLFieldData[this.getHeaderID(input.id)] = input.value;
+    } else {
+      delete inputMLFieldData[this.getHeaderID(input.id)];
+    }
+    setInputMLFieldData(inputMLFieldData);
+    input.style.fontFamily = held_item_details?.font || default_pen_font;
+    input.style.color = held_item_details?.color || default_pen_color;
+    input.defaultValue = input.value;
+    this.enabledInputFieldCache[input.id] = input;
+  };
+
+  componentMLDidMount() {
+    document.addEventListener('input', this.onInputHandler);
+  }
+
+  componentMLWillUnmount() {
+    document.removeEventListener('input', this.onInputHandler);
+  }
+
+  shouldComponentMLUpdate(nextProps: Readonly<PreviewViewProps>): boolean {
+    if (!this.props.canEdit) return true;
+
+    return this.props.canEdit !== nextProps.canEdit;
+  }
+  // FLUFFY END
 
   // Creates the partial inline HTML for previewing or reading the paper from
   // only static_ui_data from DM.
@@ -345,6 +392,12 @@ export class PreviewView extends Component<PreviewViewProps> {
     return `paperfield_${index}`;
   };
 
+  // FLUFFY START
+  createmlIDHeader = (index: number | string): string => {
+    return 'papermlfield_' + index;
+  };
+  // FLUFFY END
+
   // Returns the width the text with the provided attributes would take up in px.
   textWidth = (text: string, font: string, fontsize: number): number => {
     const c = document.createElement('canvas');
@@ -400,11 +453,52 @@ export class PreviewView extends Component<PreviewViewProps> {
       );
     });
 
+    // FLUFFY START
+    const ret_text2 = ret_text.replace(multilineFieldRegex, (match, p1) => {
+      return this.createMultilineInputField(
+        font,
+        fontSize,
+        color,
+        this.createmlIDHeader(0),
+        forceReadonlyFields,
+      );
+    });
+    // FLUFFY END
+
     return {
       nextCounter: counter,
-      text: ret_text,
+      text: ret_text2, // FLUFFY ORIGINAL: text: ret_text,
     };
   };
+
+  // FLUFFY START
+  createMultilineInputField = (
+    font: string,
+    fontSize: number,
+    color: string,
+    id: string,
+    readOnly: boolean,
+  ): string => {
+    const { data } = useBackend<PaperContext>();
+    const { held_item_details } = data;
+
+    const fontColor = held_item_details?.color || color;
+    const fontFace = held_item_details?.font || font;
+
+    let input = document.createElement('textarea');
+    input.id = id;
+    input.autocomplete = 'off';
+    input.style.fontSize = `${fontSize}px`;
+    input.style.fontFamily = fontFace;
+    input.style.color = fontColor;
+    input.style.resize = 'none';
+    input.style.width = '100%';
+    input.rows = 5;
+    input.disabled = readOnly;
+
+    return `${input.outerHTML}`;
+  };
+  // FLUFFY END
 
   // Builds an <input> field from the supplied props.
   createInputField = (
