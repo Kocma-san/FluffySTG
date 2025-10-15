@@ -112,16 +112,16 @@
 			}
 
 			.circle_button {
-				color: #4a6953;
+				color: #556955;
 				background-color: transparent;
-				border: 4px dotted #4a6953;
+				border: 4px dotted #556955;
 				border-radius: 100%;
 				width: 46px;
 				height: 46px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png'), pointer;
+				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png') 10 0, pointer;
 				text-decoration: none;
 				transition: all 0.1s ease;
 			}
@@ -129,10 +129,6 @@
 			.circle_button:hover {
 				background-color: rgba(74, 105, 83, 0.1);
 				border-color: #61886c;
-			}
-
-			.circle_button:active {
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link_press.png'), pointer;
 			}
 
 			.circle_button img {
@@ -164,14 +160,14 @@
 				font-family: "PixelPlay";
 				font-weight: lighter;
 				text-decoration: none;
-				font-size: 3vmin;
+				font-size: 4vmin;
 				line-height: 3.5vmin;
 				width: 100%;
 				text-align: center;
-				color: #475347;
+				color: #556955;
 				height: 3.6vmin;
 				letter-spacing: 1px;
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png'), pointer;
+				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png') 10 0, pointer;
 				margin: 15px 0 6px 0;
 				padding: 0 1rem;
 				overflow: visible;
@@ -183,17 +179,16 @@
 				bottom: -5px;
 				left: 0;
 				width: 100%;
-				border-bottom: 3px dotted #4a6953;
+				border-bottom: 3px dotted #556955;
 			}
 
 			.menu_button:hover {
-				background-color: #4a6953;
+				background-color: #556955;
 				color: black;
 			}
 
 			.menu_button:active {
 				transform: translate(2px, 2px);
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link_press.png'), pointer;
 			}
 
 			@keyframes pollsbox {
