@@ -26,7 +26,7 @@
 				background-color: black;
 				padding-top: 5vmin;
 				user-select: none;
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor.png'), default;
+				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor.png') 3 1, default;
 			}
 
 			img {
@@ -121,7 +121,7 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png') 10 0, pointer;
+				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png') 15 5, pointer;
 				text-decoration: none;
 				transition: all 0.1s ease;
 			}
@@ -164,10 +164,10 @@
 				line-height: 3.5vmin;
 				width: 100%;
 				text-align: center;
-				color: #556955;
+				color: #617d61;
 				height: 3.6vmin;
 				letter-spacing: 1px;
-				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png') 10 0, pointer;
+				cursor: url('http://cdn.fluffy-frontier.ru/icons/cursor_link.png') 15 5, pointer;
 				margin: 15px 0 6px 0;
 				padding: 0 1rem;
 				overflow: visible;
@@ -179,11 +179,11 @@
 				bottom: -5px;
 				left: 0;
 				width: 100%;
-				border-bottom: 3px dotted #556955;
+				border-bottom: 3px dotted #617d61;
 			}
 
 			.menu_button:hover {
-				background-color: #556955;
+				background-color: #617d61;
 				color: black;
 			}
 
