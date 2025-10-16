@@ -10,6 +10,7 @@
 	anchored_tabletop_offset = 6
 	max_integrity = 100
 	pass_flags = PASSTABLE
+	// ## Прикрутиь к полу
 
 	// Temporary things
 	use_power = NO_POWER_USE
@@ -18,11 +19,12 @@
 	/// Unique identificator for phone
 	var/phone_id
 	/// generated identificator lenght (Используется только если ID телефона не установлен)
-	var/phone_id_length = 6
+	var/phone_id_length = 5 // ## Переместить в дефайн
 	/// The current input of the numpad on the telephone
 	var/numeric_input = ""
 
-	var/enabled = TRUE
+	/// Подключен ли телефон к какой-либо сети
+	var/has_connection = TRUE // ## Переместить в метод, добавить в этот метод проверку на прикрученность к полу (посмотреть как у дргуих машин сделано)
 
 	/// Текущее соединение
 	var/datum/phone_connection/current_connection
@@ -37,12 +39,15 @@
 
 /obj/machinery/stationary_phone/Initialize(mapload)
 	. = ..()
+	// Генерация уникального номера телефона
 	if(!phone_id)
 		phone_id = generate_unique_id(len = phone_id_length)
 
+	// Создание трубки телефона и подключение ее к телефону
 	var/obj/item/phone_handset/handset = new(src)
 	connect_handset(handset)
 
+	// Создание всех loop_sound
 	connection_problem_loop_sound = new(null)
 	hangup_loop_sound = new(null)
 	busy_loop_sound = new(null)
@@ -81,7 +86,7 @@
 
 /obj/machinery/stationary_phone/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
 	if(tool == attached_handset)
-		interact(user)
+		interact(user) // Если нажать ЛКМ с трубкой в руках - откроется интерфейс телефона
 		return ITEM_INTERACT_BLOCKING
 	return ..()
 
@@ -165,7 +170,7 @@
  */
 
 /obj/machinery/stationary_phone/proc/get_current_status()
-	if(!enabled)
+	if(!has_connection)
 		return PHONE_UNAVAILABLE
 	if(current_connection)
 		return PHONE_UNAVAILABLE
@@ -209,12 +214,13 @@
 	calling_phone = calling
 	calling_phone.current_connection = src
 
+	// Получение телефона, на который пойдет звонок
 	dialed_phone = get_phone_by_id(dialed_number)
-	if(dialed_phone == calling)
-		qdel(src)
-		return
 	if(isnull(dialed_phone))
 		calling_phone.start_connection_problem_sound()
+		qdel(src)
+		return
+	if(dialed_phone == calling)
 		qdel(src)
 		return
 	if(dialed_phone.get_current_status() != PHONE_AVAILABLE)
@@ -229,6 +235,7 @@
 	dialed_phone.start_ring_sound()
 	dialed_phone.update_icon(UPDATE_ICON_STATE)
 
+	// Создание таймера таймаута звонка. По истечению - звонок сбросится
 	timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(connection_timeout)), timeout_duration, TIMER_UNIQUE|TIMER_STOPPABLE)
 
 /datum/phone_connection/Destroy(force)
@@ -251,6 +258,7 @@
 /datum/phone_connection/proc/complete_connection()
 	current_status = CONSTATUS_INITIALIZED
 
+	// Удаление таймера таймаута
 	deltimer(timeout_timer_id)
 	timeout_timer_id = null
 
@@ -260,6 +268,7 @@
 	connected_phone = dialed_phone
 	dialed_phone = null
 
+	// Регистрация сигналов передачи сообщений
 	RegisterSignal(calling_phone.attached_handset, COMSIG_MOVABLE_HEAR, PROC_REF(transmitt_data))
 	RegisterSignal(connected_phone.attached_handset, COMSIG_MOVABLE_HEAR, PROC_REF(transmitt_data))
 
@@ -296,10 +305,12 @@
 /datum/phone_connection/proc/transmitt_data(datum/source, list/hearing_args)
 	SIGNAL_HANDLER
 
+	// Пытаемся понять, а кому сосбтвенно сообщение нужно передать
 	var/obj/item/phone_handset/getter = connected_phone.attached_handset
 	if(getter == source)
 		getter = calling_phone.attached_handset
 
+	// Воспроизведение сообщения из целевого телефона
 	getter.play_message(
 		hearing_args[HEARING_SPEAKER],
 		hearing_args[HEARING_LANGUAGE],
@@ -331,7 +342,7 @@
 
 /obj/item/phone_handset/Initialize(mapload)
 	. = ..()
-	become_hearing_sensitive()
+	become_hearing_sensitive() // Нам нужно научиться слышать, чтоб передать сообщение
 
 /obj/item/phone_handset/Destroy(force)
 	connected_phone.disconnect_handset()
@@ -346,6 +357,7 @@
 		return FALSE
 	return ..()
 
+/// Воспроизводит сообщение, переданное с другого телефона
 /obj/item/phone_handset/proc/play_message(atom/movable/speaker, message_language, raw_message, list/spans, list/message_mods)
 	playsound(src, get_sound_file("talk_phone"), 50, TRUE, SILENCED_SOUND_EXTRARANGE)
 
@@ -363,7 +375,7 @@
 			continue
 		hearer.Hear(null, src, message_language, raw_message, null, spans, message_mods, speech_range)
 
-
+/// Проверяет, находится ли трубка сейчас на телефоне. На нем -> TRUE, нет -> FALSE
 /obj/machinery/stationary_phone/proc/is_handset_on_phone()
 	if(isnull(attached_handset))
 		return FALSE
@@ -371,16 +383,26 @@
 		return TRUE
 	return FALSE
 
+/// Подключение трубки к самому телефону
 /obj/machinery/stationary_phone/proc/connect_handset(obj/item/phone_handset/handset)
 	if(attached_handset)
 		stack_trace("Phone handset are connecting to a phone with existed handset!")
 	attached_handset = handset
 	attached_handset.connected_phone = src
+	AddComponent( \
+		/datum/component/phone_cable, \
+		attached_handset, \
+		4, \
+		"cable", \
+		"wire", \
+		'tff_modular/modules/colonial_marines/new_phone/icons/phone.dmi', \
+	)
 
+/// Отключение трубки от телефона
 /obj/machinery/stationary_phone/proc/disconnect_handset()
 	attached_handset.connected_phone = null
 	attached_handset = null
-
+	qdel(GetComponent(/datum/component/phone_cable))
 
 
 

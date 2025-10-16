@@ -9345,6 +9345,7 @@
 #include "tff_modular\modules\clothing\backpack\backpack.dm"
 #include "tff_modular\modules\clothing\suit\suit.dm"
 #include "tff_modular\modules\colonial_marines\new_phone\aadefines.dm"
+#include "tff_modular\modules\colonial_marines\new_phone\cable_tether.dm"
 #include "tff_modular\modules\colonial_marines\new_phone\misc.dm"
 #include "tff_modular\modules\colonial_marines\new_phone\phone_looping_sounds.dm"
 #include "tff_modular\modules\colonial_marines\new_phone\telephone.dm"

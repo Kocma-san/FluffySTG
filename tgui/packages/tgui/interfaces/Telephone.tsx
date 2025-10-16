@@ -8,8 +8,8 @@ type Data = {
   numeric_input: string;
 };
 
-export const Telephone = (props) => {
-  const { act, data } = useBackend<Data>();
+export const Telephone = () => {
+  const { data } = useBackend<Data>();
   const { numeric_input } = data;
   return (
     <Window width={325} height={420} theme="retro">
@@ -48,7 +48,7 @@ const KEYPAD = [
   ['3', '6', '9', 'C'],
 ] as const;
 
-export function PhoneKeypad(props) {
+function PhoneKeypad() {
   const { act } = useBackend();
 
   return (
@@ -67,9 +67,9 @@ export function PhoneKeypad(props) {
                 lineHeight={1.25}
                 width="55px"
                 className={classes([
-                  'Telephone__Button',
-                  'Telephone__Button--keypad',
-                  'Telephone__Button--' + key,
+                  `Telephone__Button`,
+                  `Telephone__Button--keypad`,
+                  `Telephone__Button--${key}`,
                 ])}
                 onClick={() => {
                   act('keypad', { digit: key });

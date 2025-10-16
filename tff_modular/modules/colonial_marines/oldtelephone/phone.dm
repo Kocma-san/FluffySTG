@@ -489,8 +489,9 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/transmitter, (-32))
 		connected_phone, src, \
 		connected_phone.range, \
 		tether_name = "cable", \
-		icon = "wire", icon_file = 'tff_modular/modules/colonial_marines/telephone/icons/phone.dmi', \
-		)
+		icon = "wire", \
+		icon_file = 'tff_modular/modules/colonial_marines/telephone/icons/phone.dmi', \
+	)
 
 /obj/item/tube_phone/proc/on_detach_phone()
 	connected_phone = null
