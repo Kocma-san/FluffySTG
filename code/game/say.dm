@@ -156,11 +156,6 @@ GLOBAL_LIST_INIT(freqtospan, list(
 	var/freqpart = radio_freq ? "\[[get_radio_name(radio_freq, radio_freq_name)]\] " : ""
 	//Speaker name
 	var/namepart = speaker.get_message_voice(visible_name)
-	// FLUFFY FRONTIER ADDITION START
-	if(istype(speaker, /obj/item/phone_handset))
-		spanpart1 = "<span class='yellowteamradio'>"
-		freqpart = "\[Telephone\]"
-	// FLUFFY FRONTIER ADDITION END
 
 	//End name span.
 	var/endspanpart = "</span>"

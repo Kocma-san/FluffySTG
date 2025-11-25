@@ -1,4 +1,5 @@
 #define COMSIG_PHONE_SEND_DATA "phone_send_data"
+#define COMSIG_CABLE_SNAPPED "cable_snapped"
 
 #define CONSTATUS_NO_STATUS 1
 #define CONSTATUS_CALLING 2

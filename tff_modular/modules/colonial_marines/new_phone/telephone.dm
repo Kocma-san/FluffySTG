@@ -74,13 +74,18 @@
 	. = ..()
 	. += "You can see small paper with a number on it: [phone_id]"
 
+	if(attached_handset)
+		. += span_info("You can see the wire coming from it.")
+	else
+		. += span_info("You can see a [span_italics("snapped")] wire coming out of it.")
+
 /obj/machinery/stationary_phone/add_context(atom/source, list/context, obj/item/held_item, mob/user)
 	context[SCREENTIP_CONTEXT_LMB] = "Open interface"
 
 	if(is_handset_on_phone())
 		context[SCREENTIP_CONTEXT_RMB] = "Pick up handset"
 	else if(held_item == attached_handset)
-		context[SCREENTIP_CONTEXT_RMB] = "Return handset"
+		context[SCREENTIP_CONTEXT_RMB] = "Put handset"
 
 	return CONTEXTUAL_SCREENTIP_SET
 
@@ -88,6 +93,18 @@
 	if(tool == attached_handset)
 		interact(user) // Если нажать ЛКМ с трубкой в руках - откроется интерфейс телефона
 		return ITEM_INTERACT_BLOCKING
+	if(istype(tool, /obj/item/phone_handset) && isnull(attached_handset))
+		var/obj/item/stack/cable_coil/cable = locate(/obj/item/stack/cable_coil) in user.held_items
+		if(isnull(cable))
+			to_chat(user, span_warning("You need to hold 5 cables in your other hand to attach new handset!"))
+			return ITEM_INTERACT_BLOCKING
+		if(!cable.tool_start_check(user, amount = 5))
+			return ITEM_INTERACT_BLOCKING
+		balloon_alert(user, "attaching handset...")
+		if(!cable.use_tool(src, user, 2 SECONDS, volume = 50, amount = 5) || is_handset_on_phone())
+			return ITEM_INTERACT_BLOCKING
+		connect_handset(tool)
+		return ITEM_INTERACT_SUCCESS
 	return ..()
 
 /obj/machinery/stationary_phone/item_interaction_secondary(mob/living/user, obj/item/tool, list/modifiers)
@@ -339,16 +356,44 @@
 	var/hear_range = 1
 	/// Может ли слышать звуки из других телефонных трубок
 	var/can_hear_other_phones = FALSE
+	/// Находится ли трубка возел уха
+	var/close_to_ear = FALSE
 
 /obj/item/phone_handset/Initialize(mapload)
 	. = ..()
 	become_hearing_sensitive() // Нам нужно научиться слышать, чтоб передать сообщение
 
 /obj/item/phone_handset/Destroy(force)
-	connected_phone.disconnect_handset()
+	if(connected_phone)
+		connected_phone.disconnect_handset()
 	return ..()
 
-/obj/item/phone_handset/Hear(message, atom/movable/speaker, message_language, raw_message, radio_freq, list/spans, list/message_mods, message_range)
+/obj/item/phone_handset/examine(mob/user)
+	. = ..()
+	if(connected_phone)
+		. += span_info("You can see the wire coming from it.")
+	else
+		. += span_info("You can see a [span_italics("snapped")] wire coming out of it.")
+
+/obj/item/phone_handset/update_icon_state()
+	. = ..()
+	if(close_to_ear)
+		inhand_icon_state = "[initial(inhand_icon_state)]_ear"
+	else
+		inhand_icon_state = initial(inhand_icon_state)
+
+/obj/item/phone_handset/attack_self(mob/user, modifiers)
+	close_to_ear = !close_to_ear
+	update_icon(UPDATE_ICON_STATE)
+	to_chat(user, "You bring the phone closer to your ear.")
+
+// Костыльный метод убирать телефон от уха
+/obj/item/phone_handset/Moved(atom/old_loc, movement_dir, forced, list/old_locs, momentum_change)
+	. = ..()
+	close_to_ear = FALSE
+	update_icon(UPDATE_ICON_STATE)
+
+/obj/item/phone_handset/Hear(atom/movable/speaker, message_language, raw_message, radio_freq, radio_freq_name, radio_freq_color, list/spans, list/message_mods = list(), message_range=0)
 	if(get_dist(src, speaker) > hear_range)
 		return FALSE
 	if(!can_hear_other_phones && istype(speaker, /obj/item/phone_handset))
@@ -360,6 +405,9 @@
 /// Воспроизводит сообщение, переданное с другого телефона
 /obj/item/phone_handset/proc/play_message(atom/movable/speaker, message_language, raw_message, list/spans, list/message_mods)
 	playsound(src, get_sound_file("talk_phone"), 50, TRUE, SILENCED_SOUND_EXTRARANGE)
+
+	if(close_to_ear)
+		spans |= SPAN_COMMAND
 
 	var/list/hearers = get_hearers_in_LOS(speech_range, src)
 
@@ -373,7 +421,17 @@
 			continue
 		if(hearer == src)
 			continue
-		hearer.Hear(null, src, message_language, raw_message, null, spans, message_mods, speech_range)
+		hearer.Hear(
+			src,
+			message_language,
+			raw_message,
+			radio_freq = "telephone",
+			radio_freq_name = "Telephone",
+			radio_freq_color = "#d1ba22",
+			spans = spans,
+			message_mods = message_mods,
+			message_range = speech_range,
+		)
 
 /// Проверяет, находится ли трубка сейчас на телефоне. На нем -> TRUE, нет -> FALSE
 /obj/machinery/stationary_phone/proc/is_handset_on_phone()
@@ -389,7 +447,9 @@
 		stack_trace("Phone handset are connecting to a phone with existed handset!")
 	attached_handset = handset
 	attached_handset.connected_phone = src
-	AddComponent( \
+	ADD_TRAIT(attached_handset, TRAIT_NO_STORAGE_INSERT, REF(src))
+
+	var/cable = AddComponent( \
 		/datum/component/phone_cable, \
 		attached_handset, \
 		4, \
@@ -397,15 +457,26 @@
 		"wire", \
 		'tff_modular/modules/colonial_marines/new_phone/icons/phone.dmi', \
 	)
+	RegisterSignal(cable, COMSIG_CABLE_SNAPPED, PROC_REF(handle_snap))
 
 /// Отключение трубки от телефона
 /obj/machinery/stationary_phone/proc/disconnect_handset()
+	if(!QDELETED(current_connection))
+		qdel(current_connection)
+
+	REMOVE_TRAIT(attached_handset, TRAIT_NO_STORAGE_INSERT, REF(src))
 	attached_handset.connected_phone = null
 	attached_handset = null
-	qdel(GetComponent(/datum/component/phone_cable))
 
+	var/cable = GetComponent(/datum/component/phone_cable)
+	if(!isnull(cable))
+		UnregisterSignal(cable, COMSIG_CABLE_SNAPPED)
+		qdel(cable)
 
-
+/// Отслеживает обрыв кабеля
+/obj/machinery/stationary_phone/proc/handle_snap()
+	SIGNAL_HANDLER
+	disconnect_handset()
 
 /*
  * Sounds
