@@ -9900,4 +9900,8 @@
 #include "tff_modular\modules\~donator\clothes\donator_uniforms.dm"
 #include "tff_modular\modules\~donator\items\donator_plushes.dm"
 #include "tff_modular\modules\~donator\items\donator_plushies_loadout.dm"
+#include "tff_modular\modules\~health_thing\__defines.dm"
+#include "tff_modular\modules\~health_thing\heartbeat.dm"
+#include "tff_modular\modules\~health_thing\human.dm"
+#include "tff_modular\modules\~health_thing\lungsbreath.dm"
 // END_INCLUDE
