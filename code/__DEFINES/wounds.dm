@@ -141,7 +141,7 @@ GLOBAL_LIST_INIT(bio_state_anatomy, list(
 #define WOUND_SERIES_LOSS_BASIC "wound_series_loss_basic"
 /// Cranial fissure wound.
 #define WOUND_SERIES_CRANIAL_FISSURE "wound_series_cranial_fissure"
-
+#define WOUND_SERIES_INTERNAL_BLEEDING "wound_series_internal_bleeding"
 // NOVA EDIT ADDITION BEGIN - MUSCLE AND SYNTH WOUNDS
 // Have to put it here so I can use it in the global list of wound series
 /// See muscle.dm and robotic_blunt.dm

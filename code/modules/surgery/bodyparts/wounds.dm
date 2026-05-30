@@ -153,6 +153,14 @@
 	new_wound.apply_wound(src, smited = smited, wound_source = wound_source)
 	return new_wound
 
+/obj/item/bodypart/proc/force_wound_limb(datum/wound/potential_wound, smited = FALSE, wound_source)
+	if(isnull(potential_wound))
+		return
+
+	var/datum/wound/new_wound = new potential_wound
+	new_wound.apply_wound(src, smited = smited, wound_source = wound_source)
+
+
 /**
  *  A simple proc to force a type of wound onto this mob. If you just want to force a specific mainline (fractures, bleeding, etc.) wound, you only need to care about the first 3 args.
  *
