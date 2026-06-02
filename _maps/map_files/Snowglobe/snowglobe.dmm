@@ -15735,6 +15735,7 @@
 /obj/effect/mapping_helpers/airlock/cyclelink_helper,
 /obj/effect/mapping_helpers/airlock/access/all/supply/mining,
 /obj/structure/fans/tiny,
+/obj/structure/cable,
 /turf/open/floor/iron,
 /area/station/cargo/miningdock)
 "eky" = (
@@ -17283,6 +17284,12 @@
 /obj/structure/cable,
 /turf/open/floor/iron,
 /area/station/commons/arrivalsshop)
+"eFw" = (
+/obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
+/obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
+/obj/structure/cable,
+/turf/open/floor/plating,
+/area/station/maintenance/department/engine/atmos/lesser)
 "eFx" = (
 /obj/structure/cable,
 /obj/structure/disposalpipe/segment,
@@ -21359,6 +21366,7 @@
 /obj/machinery/door/airlock/external,
 /obj/effect/mapping_helpers/airlock/cyclelink_helper,
 /obj/effect/mapping_helpers/airlock/access/all/engineering/maintenance,
+/obj/structure/cable,
 /turf/open/floor/plating,
 /area/station/maintenance/department/engine/atmos/lesser)
 "fJG" = (
@@ -22833,6 +22841,7 @@
 /turf/open/floor/plating,
 /area/station/maintenance/department/science/lower)
 "geM" = (
+/obj/structure/cable,
 /turf/open/floor/iron,
 /area/station/cargo/miningdock)
 "geO" = (
@@ -29761,6 +29770,7 @@
 /obj/item/clothing/mask/gas/atmos,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/supply/hidden/layer4,
 /obj/machinery/atmospherics/pipe/smart/manifold4w/scrubbers/hidden/layer2,
+/obj/structure/cable,
 /turf/open/floor/plating,
 /area/station/maintenance/department/engine/atmos/lesser)
 "hWH" = (
@@ -34382,6 +34392,7 @@
 	dir = 1
 	},
 /obj/effect/mapping_helpers/airlock/access/all/engineering/maintenance,
+/obj/structure/cable,
 /turf/open/floor/plating,
 /area/station/maintenance/department/engine/atmos/lesser)
 "jgo" = (
@@ -45014,6 +45025,10 @@
 /obj/machinery/space_heater,
 /turf/open/floor/iron,
 /area/station/maintenance/department/engineering/engie_aft_starboard)
+"lWu" = (
+/obj/structure/cable,
+/turf/open/floor/plating,
+/area/station/maintenance/department/engine/atmos/lesser)
 "lWA" = (
 /obj/effect/turf_decal/trimline/yellow/line,
 /turf/open/floor/iron/edge,
@@ -55202,6 +55217,11 @@
 	},
 /turf/open/floor/iron/dark,
 /area/station/science/ordnance)
+"oKH" = (
+/obj/machinery/power/weather_tower,
+/obj/structure/cable,
+/turf/open/floor/plating/snowed/smoothed/icemoon,
+/area/icemoon/underground/explored)
 "oKI" = (
 /obj/structure/table/wood,
 /obj/item/paper_bin{
@@ -64159,6 +64179,7 @@
 /area/station/commons/dorms/room7)
 "rlx" = (
 /obj/machinery/mining_weather_monitor/directional/east,
+/obj/structure/cable,
 /turf/open/floor/plating,
 /area/station/maintenance/department/engine/atmos/lesser)
 "rlE" = (
@@ -72554,6 +72575,11 @@
 	},
 /turf/open/floor/iron/brick,
 /area/station/hallway/primary/forestarboardhall)
+"tvO" = (
+/obj/structure/cable,
+/obj/machinery/power/weather_tower,
+/turf/open/floor/plating/snowed/smoothed/icemoon,
+/area/icemoon/surface/outdoors/nospawn)
 "tvW" = (
 /obj/effect/turf_decal/stripes/line{
 	dir = 6
@@ -79738,6 +79764,11 @@
 /obj/structure/flora/bush/flowers_br/style_2,
 /turf/open/floor/grass,
 /area/station/hallway/primary/starboard)
+"vpA" = (
+/obj/machinery/power/weather_tower,
+/obj/structure/cable,
+/turf/open/floor/plating/snowed/smoothed/icemoon,
+/area/icemoon/surface/outdoors/nospawn)
 "vpD" = (
 /obj/item/toy/plush/lizard_plushie{
 	name = "Montresaur";
@@ -87525,6 +87556,10 @@
 	dir = 1
 	},
 /area/station/engineering/main)
+"xoF" = (
+/obj/structure/cable,
+/turf/open/floor/plating/snowed/smoothed/icemoon,
+/area/icemoon/underground/explored)
 "xoJ" = (
 /obj/machinery/computer/dna_console{
 	dir = 8
@@ -180022,7 +180057,7 @@ tPn
 iLK
 tPn
 uuP
-uuP
+xoF
 eki
 geM
 geM
@@ -180279,7 +180314,7 @@ tPn
 hJF
 tPn
 uuP
-uuP
+xoF
 hew
 gcV
 xkN
@@ -180536,7 +180571,7 @@ tPn
 hJF
 tPn
 uuP
-uuP
+xoF
 hew
 hew
 azq
@@ -180793,7 +180828,7 @@ tPn
 hJF
 tPn
 uuP
-uuP
+xoF
 nFi
 tPn
 tPn
@@ -181050,7 +181085,7 @@ tKY
 hJF
 tPn
 uuP
-uuP
+xoF
 tPn
 tPn
 rGV
@@ -181307,9 +181342,9 @@ tKY
 bKB
 bIS
 uuP
-uuP
-tPn
-tPn
+xoF
+xoF
+oKH
 tPn
 tPn
 tPn
@@ -185753,15 +185788,15 @@ uwV
 nqV
 uhj
 iPX
-mJj
-cgu
+eFw
+lWu
 fJy
-cgu
+lWu
 rlx
 jgm
-uuP
-uuP
-uuP
+xoF
+xoF
+xoF
 tPn
 tPn
 uuP
@@ -186018,7 +186053,7 @@ jdO
 jdO
 nFi
 tPn
-uuP
+xoF
 tPn
 tPn
 uuP
@@ -186275,7 +186310,7 @@ vBO
 vBO
 tPn
 tPn
-uuP
+xoF
 tPn
 tPn
 tPn
@@ -186532,9 +186567,9 @@ vBO
 tPn
 tPn
 tPn
-uuP
-tPn
-tPn
+xoF
+xoF
+oKH
 tPn
 tPn
 tPn
@@ -268768,8 +268803,8 @@ jcZ
 jcZ
 jcZ
 aIO
-nZN
-jcZ
+stA
+tvO
 jcZ
 oaq
 jcZ
@@ -273874,7 +273909,7 @@ nZN
 jcZ
 jcZ
 jcZ
-jcZ
+nZN
 jcZ
 jcZ
 jcZ
@@ -274131,7 +274166,7 @@ nZN
 jcZ
 uHq
 jcZ
-jcZ
+nZN
 jcZ
 jcZ
 dst
@@ -274388,7 +274423,7 @@ nZN
 jcZ
 jcZ
 jcZ
-jcZ
+nZN
 jcZ
 jcZ
 jcZ
@@ -274645,9 +274680,9 @@ nZN
 jcZ
 jcZ
 jcZ
-jcZ
-jcZ
-jcZ
+stA
+stA
+vpA
 jcZ
 jcZ
 jcZ
@@ -274902,7 +274937,7 @@ nZN
 jcZ
 jcZ
 jcZ
-jcZ
+stA
 jcZ
 jcZ
 jcZ
@@ -275159,7 +275194,7 @@ jcZ
 jcZ
 jcZ
 xWy
-jcZ
+stA
 xWy
 jcZ
 jcZ
