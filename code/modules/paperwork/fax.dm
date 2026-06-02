@@ -59,6 +59,8 @@ GLOBAL_VAR_INIT(nt_fax_department, pick("NT HR Department", "NT Legal Department
 		nanotrasen = list(fax_name = "NT HR Department", fax_id = "central_command", color = "teal", emag_needed = FALSE),
 		syndicate = list(fax_name = "Sabotage Department", fax_id = "syndicate", color = "red", emag_needed = TRUE),
 	)
+	/// List of PDAs connected to this fax
+	var/list/connected_pdas
 
 /obj/machinery/fax/auto_name
 	name = "Auto-naming Fax Machine"
@@ -196,6 +198,19 @@ GLOBAL_VAR_INIT(nt_fax_department, pick("NT HR Department", "NT Legal Department
 			item.forceMove(src)
 			update_appearance()
 		return
+	if (istype(item, /obj/item/modular_computer/pda))
+		LAZYINITLIST(connected_pdas)
+		var/datum/weakref/ref = WEAKREF(item)
+		if (ref in connected_pdas)
+			connected_pdas -= ref
+			to_chat(user, span_notice("PDA is uNtIeD from this fax"))
+			return
+		if (length(connected_pdas) > 3)
+			to_chat(user, span_warning("Too many PDAs are linked to this fax!"))
+			return
+		connected_pdas += ref
+		to_chat(user, span_notice("PDA is linked to this fax"))
+		return
 	return ..()
 
 /**
@@ -281,6 +296,7 @@ GLOBAL_VAR_INIT(nt_fax_department, pick("NT HR Department", "NT Legal Department
 			continue
 		special_networks_data += list(special_networks[key])
 	data["special_faxes"] = special_networks_data
+	data["pda_is_connected"] = connected_pdas ? TRUE : FALSE
 	return data
 
 /obj/machinery/fax/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
@@ -338,6 +354,10 @@ GLOBAL_VAR_INIT(nt_fax_department, pick("NT HR Department", "NT Legal Department
 			history_clear()
 			return TRUE
 
+		if("disconnect_all_pda")
+			LAZYNULL(connected_pdas)
+			return TRUE
+
 /**
  * Records logs of bureacratic action
  * Arguments:
@@ -390,6 +410,7 @@ GLOBAL_VAR_INIT(nt_fax_department, pick("NT HR Department", "NT Legal Department
 	playsound(src, 'sound/machines/printer.ogg', 50, FALSE)
 	INVOKE_ASYNC(src, PROC_REF(animate_object_travel), loaded, "fax_receive", find_overlay_state(loaded, "receive"))
 	say("Received correspondence from [sender_name].")
+	send_pda_notification(sender_name)
 	history_add("Receive", sender_name)
 	addtimer(CALLBACK(src, PROC_REF(vend_item), loaded), 1.9 SECONDS)
 
@@ -504,6 +525,32 @@ GLOBAL_VAR_INIT(nt_fax_department, pick("NT HR Department", "NT Legal Department
 	var/check_range = TRUE
 	return electrocute_mob(user, get_area(src), src, 0.7, check_range)
 
+/obj/machinery/fax/proc/send_pda_notification(sender_name)
+	if(!connected_pdas)
+		return FALSE
+	if(!length(GLOB.announcement_systems))
+		return FALSE
+	var/obj/machinery/announcement_system/announcement_system = pick(GLOB.announcement_systems)
+
+	var/list/targets = list()
+	for(var/datum/weakref/pda_ref in connected_pdas)
+		var/obj/item/modular_computer/pda/pda = pda_ref.resolve()
+		for(var/datum/computer_file/program/messenger/messenger_app in pda.stored_files)
+			targets += messenger_app
+
+	if(!length(targets))
+		return FALSE
+
+	var/datum/signal/subspace/messaging/tablet_message/signal = new(announcement_system, list(
+		"fakename" = fax_name,
+		"fakejob" = "Fax",
+		"message" = "New message received from [sender_name]!",
+		"targets" = targets,
+		"automated" = TRUE,
+	))
+
+	signal.send_to_receivers()
+	return TRUE
 
 /obj/machinery/fax/add_context(atom/source, list/context, obj/item/held_item, mob/user)
 	. = ..()

@@ -2,6 +2,7 @@ import { Box, Button, LabeledList, Section, Table } from 'tgui-core/components';
 
 import { sortBy } from '../../common/collections';
 import { useBackend } from '../backend';
+import { Box, Button, LabeledList, Section, Table } from '../components';
 import { Window } from '../layouts';
 
 type FaxData = {
@@ -13,6 +14,7 @@ type FaxData = {
   syndicate_network: boolean;
   fax_history: FaxHistory[];
   special_faxes: FaxSpecial[];
+  pda_is_connected: boolean;
 };
 
 type FaxInfo = {
@@ -56,7 +58,17 @@ export const Fax = (props) => {
   return (
     <Window width={340} height={540}>
       <Window.Content scrollable>
-        <Section title="About Fax">
+        <Section
+          title="About Fax"
+          buttons={
+            <Button
+              icon="link-slash"
+              tooltip="Disconnect all PDA from this fax"
+              onClick={() => act('disconnect_all_pda')}
+              disabled={!data.pda_is_connected}
+            />
+          }
+        >
           <LabeledList.Item label="Network name">
             {data.fax_name}
           </LabeledList.Item>
