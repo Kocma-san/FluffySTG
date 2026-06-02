@@ -1,0 +1,107 @@
+/*
+////ARMOR PENETRATION////
+//See Neth's armor comments for how this works. Higher is better.
+*/
+
+#define ARMOR_PENETRATION_TIER_1 5
+#define ARMOR_PENETRATION_TIER_2 10
+#define ARMOR_PENETRATION_TIER_3 15
+#define ARMOR_PENETRATION_TIER_4 20
+#define ARMOR_PENETRATION_TIER_5 25
+#define ARMOR_PENETRATION_TIER_6 30
+#define ARMOR_PENETRATION_TIER_7 35
+#define ARMOR_PENETRATION_TIER_8 40
+#define ARMOR_PENETRATION_TIER_9 45
+#define ARMOR_PENETRATION_TIER_10 50
+
+/*
+////DAMAGE////
+*/
+
+#define BASE_BULLET_DAMAGE_MULT 1
+#define BULLET_DAMAGE_MULT_TIER_1 0.05
+#define BULLET_DAMAGE_MULT_TIER_2 0.10
+#define BULLET_DAMAGE_MULT_TIER_3 0.15
+#define BULLET_DAMAGE_MULT_TIER_4 0.20
+#define BULLET_DAMAGE_MULT_TIER_5 0.25
+#define BULLET_DAMAGE_MULT_TIER_6 0.30
+#define BULLET_DAMAGE_MULT_TIER_7 0.35
+#define BULLET_DAMAGE_MULT_TIER_8 0.40
+#define BULLET_DAMAGE_MULT_TIER_9 0.45
+#define BULLET_DAMAGE_MULT_TIER_10 0.50
+
+/*
+////FIRE DELAY////
+//How many ticks you have to wait between firing. Burst delay uses the same variable!
+*/
+
+/// General Delay Tiers
+#define FIRE_DELAY_TIER_1 12
+#define FIRE_DELAY_TIER_2 10
+#define FIRE_DELAY_TIER_3 9
+#define FIRE_DELAY_TIER_4 8
+#define FIRE_DELAY_TIER_5 7
+#define FIRE_DELAY_TIER_6 6
+#define FIRE_DELAY_TIER_7 5
+#define FIRE_DELAY_TIER_8 4
+#define FIRE_DELAY_TIER_9 3.5
+#define FIRE_DELAY_TIER_10 3
+#define FIRE_DELAY_TIER_11 2.5
+#define FIRE_DELAY_TIER_LMG 2
+#define FIRE_DELAY_TIER_SG 2
+#define FIRE_DELAY_TIER_SMG 1.5
+#define FIRE_DELAY_TIER_12 1
+
+/*
+////BURST AMOUNT////
+*/
+
+#define BURST_AMOUNT_TIER_1 1
+#define BURST_AMOUNT_TIER_2 2
+#define BURST_AMOUNT_TIER_3 3
+#define BURST_AMOUNT_TIER_4 4
+#define BURST_AMOUNT_TIER_5 5
+#define BURST_AMOUNT_TIER_6 6
+
+/*
+////RECOIL////
+*/
+
+#define RECOIL_AMOUNT_TIER_0 6
+#define RECOIL_AMOUNT_TIER_1 5
+#define RECOIL_AMOUNT_TIER_2 4
+#define RECOIL_AMOUNT_TIER_2_5 3.4
+#define RECOIL_AMOUNT_TIER_3 3
+#define RECOIL_AMOUNT_TIER_4 2
+#define RECOIL_AMOUNT_TIER_5 1
+#define RECOIL_OFF 0
+
+/*
+////AMMO TRAVEL SPEED////
+//How many tiles it travels per tick.
+*/
+
+#define AMMO_SPEED_TIER_1 1
+#define AMMO_SPEED_TIER_2 2
+#define AMMO_SPEED_TIER_3 3
+#define AMMO_SPEED_TIER_4 4
+#define AMMO_SPEED_TIER_5 5
+#define AMMO_SPEED_TIER_6 6
+#define AMMO_SPEED_TIER_7 7
+
+/*
+////SHRAPNEL CHANCE////
+// % chance for shrapnel generation when getting hit by something.
+*/
+
+#define SHRAPNEL_CHANCE_TIER_1 10
+#define SHRAPNEL_CHANCE_TIER_2 20
+#define SHRAPNEL_CHANCE_TIER_3 30
+#define SHRAPNEL_CHANCE_TIER_4 40
+#define SHRAPNEL_CHANCE_TIER_5 50
+#define SHRAPNEL_CHANCE_TIER_6 60
+#define SHRAPNEL_CHANCE_TIER_7 70
+#define SHRAPNEL_CHANCE_TIER_8 80
+#define SHRAPNEL_CHANCE_TIER_9 90
+#define SHRAPNEL_CHANCE_TIER_10 100
+
