@@ -48,7 +48,7 @@ const GeneralPanel = (props) => {
 
   const categories: string[] = [];
   for (let i = 0; i < transmitters.length; i++) {
-    let transmitter_data = transmitters[i];
+    const transmitter_data = transmitters[i];
     if (categories.includes(transmitter_data.phone_category)) continue;
 
     categories.push(transmitter_data.phone_category);

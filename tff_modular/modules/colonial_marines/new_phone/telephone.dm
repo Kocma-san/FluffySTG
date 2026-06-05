@@ -10,12 +10,13 @@
 	anchored_tabletop_offset = 6
 	max_integrity = 100
 	pass_flags = PASSTABLE
-	// ## Прикрутиь к полу
 
 	// Temporary things
 	use_power = NO_POWER_USE
 	// End
 
+	/// Название телефона
+	var/phone_name = "Telephone"
 	/// Unique identificator for phone
 	var/phone_id
 	/// generated identificator lenght (Используется только если ID телефона не установлен)
@@ -25,6 +26,8 @@
 
 	/// Подключен ли телефон к какой-либо сети
 	var/has_connection = TRUE // ## Переместить в метод, добавить в этот метод проверку на прикрученность к полу (посмотреть как у дргуих машин сделано)
+	/// Может ли работать, если не прикручен к полу
+	var/opertional_while_unanchored = FALSE
 
 	/// Текущее соединение
 	var/datum/phone_connection/current_connection
@@ -40,7 +43,9 @@
 /obj/machinery/stationary_phone/Initialize(mapload)
 	. = ..()
 	// Генерация уникального номера телефона
-	if(!phone_id)
+	if(phone_id)
+		generate_unique_id(count_other_id = phone_id)
+	else
 		phone_id = generate_unique_id(len = phone_id_length)
 
 	// Создание трубки телефона и подключение ее к телефону
@@ -74,6 +79,9 @@
 	. = ..()
 	. += "You can see small paper with a number on it: [phone_id]"
 
+	if(!is_operational)
+		. += span_alert("The screen is black and unresponsive!")
+
 	if(attached_handset)
 		. += span_info("You can see the wire coming from it.")
 	else
@@ -88,6 +96,16 @@
 		context[SCREENTIP_CONTEXT_RMB] = "Put handset"
 
 	return CONTEXTUAL_SCREENTIP_SET
+
+/obj/machinery/stationary_phone/update_icon_state()
+	. = ..()
+	if(!is_handset_on_phone())
+		icon_state = "[base_icon_state]-ear"
+	else if(current_connection && current_connection.dialed_phone == src)
+		icon_state = "[base_icon_state]-ring"
+	else
+		icon_state = "[base_icon_state]"
+
 
 /obj/machinery/stationary_phone/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
 	if(tool == attached_handset)
@@ -131,14 +149,10 @@
 		update_icon(UPDATE_ICON_STATE)
 		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
-/obj/machinery/stationary_phone/update_icon_state()
+/obj/machinery/stationary_phone/wrench_act(mob/living/user, obj/item/tool)
 	. = ..()
-	if(!is_handset_on_phone())
-		icon_state = "[base_icon_state]-ear"
-	else if(current_connection && current_connection.dialed_phone == src)
-		icon_state = "[base_icon_state]-ring"
-	else
-		icon_state = "[base_icon_state]"
+	default_unfasten_wrench(user, tool)
+	return ITEM_INTERACT_SUCCESS
 
 /*
  * UI
@@ -154,6 +168,22 @@
 	var/list/data = list()
 	data["numeric_input"] = numeric_input
 	return data
+
+/obj/machinery/stationary_phone/ui_static_data(mob/user)
+	. = ..()
+	var/list/data = list()
+
+	// FOR OLD UI VERSION
+	var/list/avalible_phones = list()
+	for(var/obj/machinery/stationary_phone/phone in SSmachines.get_machines_by_type_and_subtypes(/obj/machinery/stationary_phone))
+		avalible_phones += list(list(
+			"phone_id" = phone.phone_id,
+			"phone_name" = phone.phone_name
+		))
+	data["avalible_phones"] = avalible_phones
+
+	return data
+
 
 /obj/machinery/stationary_phone/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
@@ -181,17 +211,23 @@
 					else
 						playsound(src, 'sound/machines/nuke/general_beep.ogg', 50, FALSE)
 					return TRUE
+		if("call")
+			var/phone_id = params["phone_id"]
+			if(!is_handset_on_phone())
+				try_start_call(phone_id)
+				numeric_input = ""
+			return TRUE
 
 /*
  * Работа звонка
  */
 
 /obj/machinery/stationary_phone/proc/get_current_status()
-	if(!has_connection)
-		return PHONE_UNAVAILABLE
 	if(current_connection)
 		return PHONE_UNAVAILABLE
 	if(!is_handset_on_phone())
+		return PHONE_UNAVAILABLE
+	if(!is_operational)
 		return PHONE_UNAVAILABLE
 	return PHONE_AVAILABLE
 
@@ -200,7 +236,6 @@
 		CRASH("Телефон с активным соединением пытается позвонить!")
 
 	new /datum/phone_connection(src, entered_number)
-
 
 /datum/phone_connection
 	var/obj/machinery/stationary_phone/calling_phone
@@ -383,9 +418,10 @@
 		inhand_icon_state = initial(inhand_icon_state)
 
 /obj/item/phone_handset/attack_self(mob/user, modifiers)
+	. = ..()
 	close_to_ear = !close_to_ear
 	update_icon(UPDATE_ICON_STATE)
-	to_chat(user, "You bring the phone closer to your ear.")
+	to_chat(user, span_notice("You bring [src] closer to your ear."))
 
 // Костыльный метод убирать телефон от уха
 /obj/item/phone_handset/Moved(atom/old_loc, movement_dir, forced, list/old_locs, momentum_change)
