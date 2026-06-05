@@ -18,8 +18,7 @@
 	name = "bluesec jacket"
 	desc = "A comfortable jacket in security blue. Probably against uniform regulations."
 	icon_state = "bluesec_jacket"
-	uses_advanced_reskins = FALSE
-	unique_reskin = list()
+
 
 /obj/item/clothing/suit/toggle/jacket/sec/bluewinter
 	icon = 'tff_modular/modules/clothing/icons/obj/suit.dmi'
@@ -27,5 +26,15 @@
 	name = "bluesec winter jacket"
 	desc = "A comfortable jacket in security blue. Probably against uniform regulations."
 	icon_state = "bluesec_winter_jacket"
-	uses_advanced_reskins = FALSE
-	unique_reskin = list()
+
+/obj/item/clothing/suit/armor/vest/interdyne/black
+	name = "black interdyne armor vest"
+	icon = 'tff_modular/modules/clothing/icons/obj/armor.dmi'
+	worn_icon = 'tff_modular/modules/clothing/icons/mob/armor.dmi'
+	icon_state = "vest_black_interdyne"
+
+/obj/item/clothing/suit/armor/vest/interdyne/white
+	name = "white interdyne armor vest"
+	icon = 'tff_modular/modules/clothing/icons/obj/armor.dmi'
+	worn_icon = 'tff_modular/modules/clothing/icons/mob/armor.dmi'
+	icon_state = "vest_white_interdyne"

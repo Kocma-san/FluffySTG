@@ -10,7 +10,7 @@
 		/datum/reagent/consumable/nutriment/protein = 4,
 		/datum/reagent/consumable/mayonnaise = 5,
 	)
-	foodtypes = VEGETABLES | MEAT | BREAKFAST
+	foodtypes = VEGETABLES | MEAT | BREAKFAST | EGG
 	tastes = list(
 		"new year" = 2,
 		"approaching pancreatitis" = 1,
@@ -49,7 +49,7 @@
 		/datum/reagent/consumable/nutriment/protein = 5,
 		/datum/reagent/consumable/mayonnaise = 5,
 	)
-	foodtypes = VEGETABLES | MEAT | BREAKFAST | SEAFOOD
+	foodtypes = VEGETABLES | MEAT | BREAKFAST | SEAFOOD | EGG
 	tastes = list(
 		"crab meat" = 2,
 		"eggs" = 1,
@@ -69,7 +69,7 @@
 		/datum/reagent/consumable/nutriment/protein = 4,
 		/datum/reagent/consumable/mayonnaise = 6,
 	)
-	foodtypes = MEAT | VEGETABLES | BREAKFAST | SEAFOOD
+	foodtypes = MEAT | VEGETABLES | BREAKFAST | SEAFOOD | EGG
 	tastes = list(
 		"new year rush" = 1,
 		"mayonnaise" = 1,
@@ -303,12 +303,13 @@
 	desc = "A small, vividly orange citrus that smells like winter holidays."
 	icon = 'tff_modular/modules/new_year_pack/icons/food_mandarin.dmi'
 	icon_state = "mandarin"
-	juice_typepath = /datum/reagent/consumable/mandarin_juice
 	wine_power = 55
 	tastes = list(
 		"sweet mandarin juice" = 8,
 		"clove oil" = 2,
 	)
+/obj/item/food/grown/citrus/mandarin/juice_typepath()
+	return /datum/reagent/consumable/mandarin_juice
 
 /obj/item/seeds/orange
 	mutatelist = list(/obj/item/seeds/lime, /obj/item/seeds/orange_3d, /obj/item/seeds/mandarin)
