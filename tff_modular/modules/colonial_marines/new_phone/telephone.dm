@@ -1,5 +1,12 @@
 #define MAX_ENTERED_NUMBER_LENGTH 8
 
+// Логирование
+// История - время раунда, номер звонящего, сообщения
+// Сборка, плата
+// Дописывание ручкой номеров в заметку, базовые номера телефонов в заметке
+// Базовые телефоны
+// Возможность менять номер телефона ?
+
 /obj/machinery/stationary_phone
 	name = "telephone receiver"
 	desc = "The finger plate is a little stiff."
@@ -33,7 +40,7 @@
 	var/datum/phone_connection/current_connection
 	/// Присоединенная трубка телефона
 	var/obj/item/phone_handset/attached_handset
-	/// Цикличные звуки
+	// Цикличные звуки
 	var/datum/looping_sound/telephone/connection_problem/connection_problem_loop_sound
 	var/datum/looping_sound/telephone/hangup/hangup_loop_sound
 	var/datum/looping_sound/telephone/busy/busy_loop_sound
@@ -44,7 +51,7 @@
 	. = ..()
 	// Генерация уникального номера телефона
 	if(phone_id)
-		generate_unique_id(count_other_id = phone_id)
+		generate_unique_id(add_id_to_list = phone_id)
 	else
 		phone_id = generate_unique_id(len = phone_id_length)
 
@@ -60,6 +67,7 @@
 	ring_loop_sound = new(null)
 
 	register_context()
+	// set_wires(new /datum/wires/telephone(src))
 
 /obj/machinery/stationary_phone/Destroy(force)
 	if(current_connection)
@@ -140,19 +148,28 @@
 	. = ..()
 	if(!can_interact(user))
 		return SECONDARY_ATTACK_CALL_NORMAL
-	if(is_handset_on_phone())
-		playsound(src, get_sound_file("rtb_handset"), 100, FALSE, 7)
-		// ## +start noise
-		user.put_in_hands(attached_handset)
-		if(current_connection)
-			current_connection.complete_connection()
-		update_icon(UPDATE_ICON_STATE)
+	if(take_handset_from_phone(user))
 		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 /obj/machinery/stationary_phone/wrench_act(mob/living/user, obj/item/tool)
 	. = ..()
 	default_unfasten_wrench(user, tool)
 	return ITEM_INTERACT_SUCCESS
+
+/obj/machinery/stationary_phone/proc/take_handset_from_phone(mob/user)
+	if(!is_handset_on_phone())
+		return FALSE
+
+	if(!user.put_in_hands(attached_handset))
+		return FALSE
+
+	if(current_connection)
+		current_connection.complete_connection()
+
+	// ## else +start_passive noise
+	playsound(src, get_sound_file("rtb_handset"), 100, FALSE, 7)
+	update_icon(UPDATE_ICON_STATE)
+	return TRUE
 
 /*
  * UI
@@ -167,6 +184,11 @@
 /obj/machinery/stationary_phone/ui_data(mob/user)
 	var/list/data = list()
 	data["numeric_input"] = numeric_input
+	data["our_number"] = phone_id
+	data["connection_status"] =  current_connection?.current_status
+	data["calling_number"] = current_connection?.calling_phone.phone_id
+	data["callee_number"] = current_connection?.dialed_phone?.phone_id || current_connection?.connected_phone?.phone_id
+
 	return data
 
 /obj/machinery/stationary_phone/ui_static_data(mob/user)
@@ -193,17 +215,23 @@
 	switch(action)
 		if("keypad")
 			playsound(src, SFX_TERMINAL_TYPE, 30, FALSE)
-			if(current_connection)
-				return TRUE
 			var/digit = params["digit"]
+			if(current_connection)
+				if(digit == "C")
+					current_connection.hangup()
+				return TRUE
 			switch(digit)
 				if("C")
 					numeric_input = copytext(numeric_input, 1, -1)
 					return TRUE
 				if("phone")
-					if(!is_handset_on_phone())
-						try_start_call(numeric_input)
-						numeric_input = ""
+					if(has_connected_handset())
+						if(!is_handset_on_phone())
+							try_start_call(numeric_input)
+							numeric_input = ""
+						else if(take_handset_from_phone(usr)) // Пытается взять телефон и если успешно - звонит
+							try_start_call(numeric_input)
+							numeric_input = ""
 					return TRUE
 				if("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 					if(length(numeric_input) < MAX_ENTERED_NUMBER_LENGTH)
@@ -229,6 +257,8 @@
 		return PHONE_UNAVAILABLE
 	if(!is_operational)
 		return PHONE_UNAVAILABLE
+	if(!anchored && !opertional_while_unanchored)
+		return PHONE_UNAVAILABLE
 	return PHONE_AVAILABLE
 
 /obj/machinery/stationary_phone/proc/try_start_call(entered_number)
@@ -242,12 +272,13 @@
 	var/obj/machinery/stationary_phone/connected_phone
 	var/obj/machinery/stationary_phone/dialed_phone
 	/// Текущее состояние соединения
-	VAR_PRIVATE/current_status = CONSTATUS_NO_STATUS
+	VAR_FINAL/current_status = CONSTATUS_NO_STATUS
 	/// Сам таймер таймаута. Нулл, если сейчас не идет вызов
 	var/timeout_timer_id
 	/// Время за которое на том конце должны взять трубку, иначе звонок сбросится
 	var/timeout_duration = 45 SECONDS
-	// ### + add history for that call
+	/// История этого соединения
+	var/datum/phone_history/history
 
 /datum/phone_connection/New(obj/machinery/stationary_phone/calling, dialed_number)
 	if(isnull(calling))
@@ -262,6 +293,8 @@
 		stack_trace("Calling phone already has connection!")
 		qdel(src)
 		return
+
+	history = new(calling, dialed_number)
 
 	calling_phone = calling
 	calling_phone.current_connection = src
@@ -290,22 +323,27 @@
 	// Создание таймера таймаута звонка. По истечению - звонок сбросится
 	timeout_timer_id = addtimer(CALLBACK(src, PROC_REF(connection_timeout)), timeout_duration, TIMER_UNIQUE|TIMER_STOPPABLE)
 
+// ВОЗМОЖНО было бы лучше заменить все qdel на отдельный прок, для окончания звонока, но сейчас мне лень насчет этого думать
 /datum/phone_connection/Destroy(force)
-    dialed_phone?.current_connection = null
-    calling_phone?.current_connection = null
-    connected_phone?.current_connection = null
-    end_connection()
-    dialed_phone = null
-    calling_phone = null
-    connected_phone = null
-    return ..()
+	history?.end_call()
+	history = null
+
+	dialed_phone?.current_connection = null
+	calling_phone?.current_connection = null
+	connected_phone?.current_connection = null
+	end_connection()
+	dialed_phone = null
+	calling_phone = null
+	connected_phone = null
+	return ..()
 
 /datum/phone_connection/proc/connection_timeout()
 	current_status = CONSTATUS_TIMEOUT
 	qdel(src)
 
 /datum/phone_connection/proc/hangup()
-	qdel(src)
+	if(!QDELETED(src))
+		qdel(src)
 
 /datum/phone_connection/proc/complete_connection()
 	current_status = CONSTATUS_INITIALIZED
@@ -326,7 +364,7 @@
 
 /datum/phone_connection/proc/end_connection()
 	switch(current_status)
-		if(CONSTATUS_NO_STATUS)	// Ничего не делаем
+		if(CONSTATUS_NO_STATUS)	// Ничего не делаем?
 		if(CONSTATUS_CALLING)
 			calling_phone.stop_dial_sound()
 			dialed_phone.stop_ring_sound()
@@ -362,6 +400,8 @@
 	if(getter == source)
 		getter = calling_phone.attached_handset
 
+	history.add_entry(hearing_args, source)
+
 	// Воспроизведение сообщения из целевого телефона
 	getter.play_message(
 		hearing_args[HEARING_SPEAKER],
@@ -382,6 +422,7 @@
 	righthand_file = 'tff_modular/modules/colonial_marines/new_phone/icons/phone_inhand_righthand.dmi'
 	icon_state = "rpb_phone"
 	inhand_icon_state = "rpb_phone"
+	w_class = WEIGHT_CLASS_SMALL
 
 	// Соединенный с трубкой телефон
 	var/obj/machinery/stationary_phone/connected_phone
@@ -391,7 +432,7 @@
 	var/hear_range = 1
 	/// Может ли слышать звуки из других телефонных трубок
 	var/can_hear_other_phones = FALSE
-	/// Находится ли трубка возел уха
+	/// Находится ли трубка возле уха
 	var/close_to_ear = FALSE
 
 /obj/item/phone_handset/Initialize(mapload)
@@ -469,13 +510,17 @@
 			message_range = speech_range,
 		)
 
-/// Проверяет, находится ли трубка сейчас на телефоне. На нем -> TRUE, нет -> FALSE
+/// Проверяет, находится ли трубка сейчас на телефоне.
 /obj/machinery/stationary_phone/proc/is_handset_on_phone()
-	if(isnull(attached_handset))
+	if(!has_connected_handset())
 		return FALSE
 	if(attached_handset.loc == src)
 		return TRUE
 	return FALSE
+
+/// Проверяет, есть ли в принципе у телефона подключенная трубка
+/obj/machinery/stationary_phone/proc/has_connected_handset()
+	return !isnull(attached_handset)
 
 /// Подключение трубки к самому телефону
 /obj/machinery/stationary_phone/proc/connect_handset(obj/item/phone_handset/handset)
@@ -498,14 +543,16 @@
 /// Отключение трубки от телефона
 /obj/machinery/stationary_phone/proc/disconnect_handset()
 	if(!QDELETED(current_connection))
-		qdel(current_connection)
+		current_connection.hangup()
 
+	stop_all_sounds()
 	REMOVE_TRAIT(attached_handset, TRAIT_NO_STORAGE_INSERT, REF(src))
+
 	attached_handset.connected_phone = null
 	attached_handset = null
 
-	var/cable = GetComponent(/datum/component/phone_cable)
-	if(!isnull(cable))
+	var/datum/cable = GetComponent(/datum/component/phone_cable)
+	if(!QDELETED(cable))
 		UnregisterSignal(cable, COMSIG_CABLE_SNAPPED)
 		qdel(cable)
 

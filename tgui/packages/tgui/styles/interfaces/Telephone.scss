@@ -73,3 +73,18 @@
     ) !important;
   }
 }
+
+.Telephone__callAnimation {
+  animation: telephoneCall 1s infinite;
+}
+
+@keyframes telephoneCall {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+}

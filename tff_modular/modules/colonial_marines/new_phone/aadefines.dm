@@ -9,3 +9,6 @@
 
 #define PHONE_UNAVAILABLE 0
 #define PHONE_AVAILABLE 1
+
+GLOBAL_LIST_EMPTY(phone_call_history)
+

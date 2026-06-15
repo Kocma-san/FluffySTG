@@ -6,6 +6,10 @@ import { Window } from '../layouts';
 
 type Data = {
   numeric_input: string;
+  our_number: string;
+  connection_status: null | number;
+  calling_number: null | string;
+  callee_number: null | string;
   avalible_phones: PhoneInfo[];
 };
 
@@ -14,14 +18,31 @@ type PhoneInfo = {
   phone_name: string;
 };
 
+function FormatPhoneNumber(phone_number) {
+  if (!phone_number || phone_number.trim() === '') return;
+  return `+${phone_number.replace(/(\d{2})(\d{1,3})?(\d{1,3})?/, (_, a, b, c) =>
+    [a, b, c].filter(Boolean).join('-'),
+  )}`;
+}
+
 export const Telephone = () => {
   const { data, act } = useBackend<Data>();
-  const { numeric_input, avalible_phones } = data;
+  const {
+    numeric_input,
+    avalible_phones,
+    our_number,
+    connection_status,
+    calling_number,
+    callee_number,
+  } = data;
 
   const categories = ['weh', 'blep'];
 
   const [selectedPhone, setSelectedPhone] = useState('');
   const [currentCategory, setCategory] = useState(categories[0]);
+
+  const otherSidePhoneNumber =
+    calling_number === our_number ? callee_number : calling_number;
 
   return (
     <Window width={520} height={420} theme="retro">
@@ -33,15 +54,20 @@ export const Telephone = () => {
                 <Stack.Item mx={4}>
                   <Stack vertical>
                     <Stack.Item>
-                      <Box height={4} className="Telephone__displayBox">
-                        {numeric_input
-                          ? '+' +
-                            numeric_input.replace(
-                              /(\d{2})(\d{1,3})?(\d{1,3})?/,
-                              (_, a, b, c) =>
-                                [a, b, c].filter(Boolean).join('-'),
-                            )
-                          : null}
+                      <Box height={4} className={'Telephone__displayBox'}>
+                        <span
+                          className={
+                            connection_status === 2
+                              ? 'Telephone__callAnimation'
+                              : ''
+                          }
+                        >
+                          {numeric_input
+                            ? FormatPhoneNumber(numeric_input)
+                            : connection_status === null
+                              ? null
+                              : FormatPhoneNumber(otherSidePhoneNumber)}
+                        </span>
                       </Box>
                     </Stack.Item>
                     <Stack.Item align="center" mt={2}>

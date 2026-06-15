@@ -1,11 +1,11 @@
 // Да, это чистая копипипаста
-/proc/generate_unique_id(len = 5, count_other_id)
+/proc/generate_unique_id(len = 5, add_id_to_list)
 	var/static/list/used_names = list()
 	var/static/valid_chars = "0123456789"
 
-	if(count_other_id)
-		used_names[count_other_id] = TRUE
-		return count_other_id
+	if(add_id_to_list)
+		used_names[add_id_to_list] = TRUE
+		return add_id_to_list
 
 	var/list/new_name = list()
 	var/text

@@ -59,7 +59,7 @@
 		vis_target = null
 
 	if(!QDELETED(tether_beam))
-		UnregisterSignal(tether_beam, COMSIG_QDELETING)
+		UnregisterSignal(tether_beam, list(COMSIG_QDELETING, COMSIG_BEAM_BEFORE_DRAW))
 		QDEL_NULL(tether_beam)
 	return ..()
 
@@ -89,7 +89,7 @@
 		if((new_vis_parent == vis_parent) && (new_vis_target == vis_target))
 			message_admins("OnBD - Все ок, ничего не надо менять")
 			return
-		UnregisterSignal(tether_beam, COMSIG_QDELETING)
+		UnregisterSignal(tether_beam, list(COMSIG_QDELETING, COMSIG_BEAM_BEFORE_DRAW))
 		QDEL_NULL(tether_beam)
 
 	if(new_vis_parent != vis_parent)
@@ -114,11 +114,22 @@
 		beam_type = /obj/effect/ebeam,
 		emissive = FALSE,
 		layer = GIB_LAYER,
-		override_target_pixel_x = vis_parent.pixel_x + 3,
-		override_target_pixel_y = vis_parent.pixel_y + 2,
 	)
-
 	RegisterSignal(tether_beam, COMSIG_QDELETING, PROC_REF(need_redraw))
+	RegisterSignal(tether_beam, COMSIG_BEAM_BEFORE_DRAW, PROC_REF(pre_beam_draw))
+
+/datum/component/phone_cable/proc/pre_beam_draw(datum/beam/beam)
+	SIGNAL_HANDLER
+
+	beam.override_target_pixel_x = vis_parent.pixel_x + 3
+	beam.override_target_pixel_y = vis_parent.pixel_y + 2
+
+	if(tether_target == vis_target && istype(tether_target, /obj/item/phone_handset))
+		beam.override_origin_pixel_x = tether_target.pixel_x - 1
+		beam.override_origin_pixel_y = tether_target.pixel_y - 8
+	else
+		beam.override_origin_pixel_x = 0
+		beam.override_origin_pixel_y = 0
 
 /datum/component/phone_cable/proc/snap()
 	message_admins("SNAP")
@@ -161,5 +172,6 @@
 		if(!istype(anchor) || anchor.anchored || !(!anchor.anchored && anchor.move_resist <= source.move_force && anchor.Move(get_step_towards(anchor, new_loc))))
 			to_chat(source, span_warning("Your tether to \the [tether_parent] prevents you from moving any further!"))
 			return COMPONENT_MOVABLE_BLOCK_PRE_MOVE
+
 
 #undef UNREGISTER_VIS_SIDE
