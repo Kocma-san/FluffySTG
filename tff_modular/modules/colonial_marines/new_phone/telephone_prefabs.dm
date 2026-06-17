@@ -1,6 +1,11 @@
 
 /obj/machinery/stationary_phone/prefab
 	start_with_attached_paper = TRUE
+	phone_networks = list(PUBLIC_PHONE_STATION)
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION)
+
+/obj/machinery/stationary_phone/prefab/basic_with_paper
+	phone_networks = null
 
 
 /obj/machinery/stationary_phone/prefab/medical
@@ -23,38 +28,50 @@
 /obj/machinery/stationary_phone/prefab/bridge
 	name = "Bridge Telephone"
 	phone_name = "Bridge"
+	phone_networks = list(PUBLIC_PHONE_STATION_COMMAND)
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/briefing_room
 	name = "Briefing Room Telephone"
 	phone_name = "Briefing Room"
+	phone_networks = list(PUBLIC_PHONE_STATION_COMMAND)
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/captain
 	name = "Captain's Telephone"
 	phone_name = "Captain's Office"
+	phone_networks = list(PUBLIC_PHONE_STATION_COMMAND)
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/cmo
 	name = "Chief Medical Officer's telephone"
 	phone_name = "Chief Medical Officer's Office"
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/hos
 	name = "Head of Security's telephone"
 	phone_name = "Head of Security's Office"
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/hop
 	name = "Head of Personnel's telephone"
 	phone_name = "Head of Personnel's Office"
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/ce
 	name = "Chief Engineer's telephone"
 	phone_name = "Chief Engineer's Office"
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/rd
 	name = "Research Director's telephone"
 	phone_name = "Research Director's Office"
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/qm
 	name = "Quartermaster's telephone"
 	phone_name = "Quartermaster's Office"
+	public_phones_on_paper = list(PUBLIC_PHONE_STATION, PUBLIC_PHONE_STATION_COMMAND)
 
 /obj/machinery/stationary_phone/prefab/detective
 	name = "Detective's Office telephone"

@@ -11,4 +11,8 @@
 #define PHONE_AVAILABLE 1
 
 GLOBAL_LIST_EMPTY(phone_call_history)
+GLOBAL_LIST_EMPTY(public_phone_list)
 
+#define PUBLIC_PHONE_STATION "station"
+#define PUBLIC_PHONE_STATION_COMMAND "station_command"
+#define PUBLIC_PHONE_SYNDICATE "syndicate"

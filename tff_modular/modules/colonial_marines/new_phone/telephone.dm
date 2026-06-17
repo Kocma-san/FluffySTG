@@ -36,6 +36,15 @@
 	/// Может ли работать, если не прикручен к полу
 	var/opertional_while_unanchored = FALSE
 
+	/// Прикреплена ли к телефону бумажка с номерам
+	var/start_with_attached_paper = FALSE
+	/// Сама бумжака /obj/item/paper. Если null - значит ничего не прикреплено
+	var/obj/item/paper/attached_paper
+	/// Не сеть в прямом смысле слова. Влияет на то, в каких публичных записях его будет видно. Если ничего - ни в каких
+	var/list/phone_networks
+	/// Будут ли добавлены на бумажку при старте информация о публичный телефонах. Список "сетей", которые будут видны на созданной бумажке. Только если start_with_attached_paper == TRUE
+	var/list/public_phones_on_paper
+
 	/// Текущее соединение
 	var/datum/phone_connection/current_connection
 	/// Присоединенная трубка телефона
@@ -54,6 +63,12 @@
 		generate_unique_id(add_id_to_list = phone_id)
 	else
 		phone_id = generate_unique_id(len = phone_id_length)
+
+	if(start_with_attached_paper)
+		var/obj/item/paper/paper = new(src)
+		attach_paper_to_phone(paper)
+		if(public_phones_on_paper)
+			add_paper_entries(...)
 
 	// Создание трубки телефона и подключение ее к телефону
 	var/obj/item/phone_handset/handset = new(src)
@@ -171,6 +186,16 @@
 	update_icon(UPDATE_ICON_STATE)
 	return TRUE
 
+/obj/machinery/stationary_phone/proc/attach_paper_to_phone(obj/item/paper/paper)
+	paper.forceMove(src)
+	attached_paper = paper
+
+/obj/machinery/stationary_phone/proc/add_paper_entries(entry)
+	if(!islist(entry))
+
+	else
+		for(var/elem in entry)
+			add_paper_entries(elem)
 /*
  * UI
  */
