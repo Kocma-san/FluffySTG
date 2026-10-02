@@ -112,7 +112,7 @@
 	port_active.set_output(connected_machine.active)
 	port_meltdown.set_output(connected_machine.meltdown)
 	port_jammed.set_output(connected_machine.jammed)
-	port_power_generation.set_output(display_power(connected_machine.last_power_generation))
+	port_power_generation.set_output(energy_to_power(connected_machine.last_power_generation))
 	port_rod_pressure.set_output(connected_machine.stored_rod?.air_contents.return_pressure() || 0)
 	port_rod_temperature.set_output(connected_machine.stored_rod?.air_contents.temperature || 0)
 	port_remaining_fuel.set_output(connected_machine.stored_rod?.air_contents.gases[/datum/gas/tritium][MOLES] || 0)
