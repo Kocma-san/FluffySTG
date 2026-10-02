@@ -13,6 +13,7 @@
 
 	var/datum/port/output/port_active
 	var/datum/port/output/port_meltdown
+	var/datum/port/output/port_meltdown_signal
 	var/datum/port/output/port_jammed
 	var/datum/port/output/port_power_generation
 	var/datum/port/output/port_rod_pressure
@@ -42,6 +43,7 @@
 
 	port_active = add_output_port("Activity", PORT_TYPE_BOOLEAN)
 	port_meltdown = add_output_port("Meldown", PORT_TYPE_BOOLEAN)
+	port_meltdown_signal = add_output_port("Meldown Signal", PORT_TYPE_SIGNAL)
 	port_jammed = add_output_port("Jammed", PORT_TYPE_BOOLEAN)
 	port_power_generation = add_output_port("Power Generation", PORT_TYPE_NUMBER)
 	port_rod_pressure = add_output_port("Rod Pressure", PORT_TYPE_NUMBER)
@@ -62,11 +64,17 @@
 	. = ..()
 	if(istype(shell, /obj/machinery/power/rbmk2))
 		connected_machine = shell
+		RegisterSignal(connected_machine, COMSIG_RBMK2_MELTDOWN, PROC_REF(handle_reactor_meltdown))
 
 /obj/item/circuit_component/rbmk2/unregister_usb_parent(atom/movable/shell)
+	UnregisterSignal(connected_machine, COMSIG_RBMK2_MELTDOWN)
 	connected_machine = null
 	return ..()
 
+/obj/item/circuit_component/rbmk2/proc/handle_reactor_meltdown(datum/source)
+	SIGNAL_HANDLER
+	port_meltdown.set_output(TRUE)
+	port_meltdown_signal.set_output(COMPONENT_SIGNAL)
 
 /obj/item/circuit_component/rbmk2/proc/handle_toggle_reactor()
 	CIRCUIT_TRIGGER

@@ -98,6 +98,7 @@
 			log_game("[src] triggered a meltdown at [AREACOORD(turf_loc)]")
 			investigate_log("triggered a meltdown at [AREACOORD(turf_loc)]", INVESTIGATE_ENGINE)
 			meltdown = TRUE
+			SEND_SIGNAL(src, COMSIG_RBMK2_MELTDOWN)
 		var/chosen_sound = pick(
 			'modular_nova/modules/RBMK2/sounds/failure01.ogg',
 			'modular_nova/modules/RBMK2/sounds/failure02.ogg',
