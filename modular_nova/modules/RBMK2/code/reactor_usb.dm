@@ -78,7 +78,7 @@
 	CIRCUIT_TRIGGER
 	if(!connected_machine)
 		return
-	connected_machine.remove_rod(do_throw = TRUE)
+	INVOKE_ASYNC(connected_machine, TYPE_PROC_REF(/obj/machinery/power/rbmk2, remove_rod), do_throw = TRUE)
 
 /obj/item/circuit_component/rbmk2/proc/handle_toggle_vents()
 	CIRCUIT_TRIGGER
